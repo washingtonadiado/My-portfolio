@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import "./index.css";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
-import AnimatedBackground from "./src/components/Background";
+import AnimatedBackground from "/src/components/Background";
 import Navbar from "./components/Navbar";
 import Portofolio from "./Pages/Portofolio";
 import ContactPage from "./Pages/Contact";
