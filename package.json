@@ -64,9 +64,10 @@
     "tailwindcss": "^3.4.14",
     "vite": "^5.4.10"
   },
-  "description": "Halo semuanya! Perkenalkan, saya Eki Zulfar Rachman, dan pada kesempatan kali ini, saya ingin berbagi proyek website portofolio yang telah saya kembangkan.",
+  "description": "Welcome to my portfolio website.",
   "main": "eslint.config.js",
   "keywords": [],
   "author": "",
   "license": "ISC"
 }
+
