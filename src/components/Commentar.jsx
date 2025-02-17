@@ -78,12 +78,17 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
           {
             cloudName: 'det8n0pcv',
             uploadPreset: 'portfolio',
+            // Enable interactive cropping and force custom coordinates
             cropping: true,
+            croppingCoordinatesMode: 'custom',
             croppingAspectRatio: 1,
             showSkipCropButton: false,
-            multiple: false,
-            sources: ['local', 'url'],
+            multiple: false, // Must be false for cropping to work
+            // Limit to local file uploads on mobile to ensure cropping UI appears
+            sources: ['local'],
             maxFileSize: 5000000,
+            // (Optional) You can include additional parameters here if your preset
+            // applies an incoming transformation (e.g. c_crop,g_custom) on the server.
           },
           (error, result) => {
             if (error) {
@@ -91,7 +96,6 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
               setUploadingImage(false);
               return;
             }
-
             if (result) {
               if (result.event === 'success') {
                 setImageURL(result.info.secure_url);
@@ -129,8 +133,6 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
     (e) => {
       e.preventDefault();
       if (!newComment.trim() || !userName.trim()) return;
-
-      // Send imageURL along with other form data as the profile picture.
       onSubmit({ newComment, userName, profession, imageURL });
       setNewComment('');
       setUserName('');
@@ -284,7 +286,6 @@ const Komentar = () => {
     async ({ newComment, userName, profession, imageURL }) => {
       setError('');
       setIsSubmitting(true);
-
       try {
         await addDoc(collection(db, 'portfolio-comments'), {
           content: newComment,
@@ -390,4 +391,5 @@ const Komentar = () => {
 };
 
 export default Komentar;
+
 
