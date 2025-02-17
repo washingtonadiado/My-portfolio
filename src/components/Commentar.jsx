@@ -78,17 +78,17 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
           {
             cloudName: 'det8n0pcv',
             uploadPreset: 'portfolio',
-            // Enable interactive cropping and force custom coordinates
-            cropping: true,
+            // Use server-side cropping so that only the cropped image is saved.
+            // IMPORTANT: Ensure that your Cloudinary upload preset is configured with an incoming transformation
+            // (for example, set "Resize & crop" to "Crop" with "Gravity" set to "Custom").
+            cropping: 'server',
             croppingCoordinatesMode: 'custom',
             croppingAspectRatio: 1,
             showSkipCropButton: false,
-            multiple: false, // Must be false for cropping to work
-            // Limit to local file uploads on mobile to ensure cropping UI appears
+            multiple: false, // Must be false to allow interactive cropping
+            // Limit to local uploads (this helps enforce the cropping UI on mobile)
             sources: ['local'],
             maxFileSize: 5000000,
-            // (Optional) You can include additional parameters here if your preset
-            // applies an incoming transformation (e.g. c_crop,g_custom) on the server.
           },
           (error, result) => {
             if (error) {
@@ -391,5 +391,6 @@ const Komentar = () => {
 };
 
 export default Komentar;
+
 
 
