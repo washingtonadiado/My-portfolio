@@ -28,31 +28,32 @@ const Comment = memo(({ comment, formatDate }) => (
           <img
             src={comment.imageURL}
             alt={`${comment.userName}'s profile`}
-            className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
+            className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500" // Reduced size
           />
         ) : (
-          <div className="p-3 rounded-full bg-indigo-500/20 text-indigo-400 group-hover:bg-indigo-500/30 transition-colors">
-            <UserCircle2 className="w-8 h-8" />
+          <div className="p-2 rounded-full bg-indigo-500/20 text-indigo-400 group-hover:bg-indigo-500/30 transition-colors">
+            <UserCircle2 className="w-6 h-6" /> {/* Reduced size */}
           </div>
         )}
       </div>
       <div className="flex-grow min-w-0">
-        <div className="flex items-center justify-between gap-4 mb-2">
-          <div>
-            <h4 className="font-semibold text-white text-xl truncate">
+        {/* Header with name and time */}
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex-1">
+            <h4 className="font-semibold text-white text-lg sm:text-xl">
               {comment.userName}
             </h4>
             {comment.profession && (
-              <span className="text-sm text-gray-400">
+              <span className="text-xs sm:text-sm text-gray-400">
                 {comment.profession}
               </span>
             )}
           </div>
-          <span className="text-base text-gray-400 whitespace-nowrap">
+          <span className="text-xs sm:text-base text-gray-400">
             {formatDate(comment.createdAt)}
           </span>
         </div>
-        <p className="text-gray-300 text-lg break-words leading-relaxed">
+        <p className="text-gray-300 text-base sm:text-lg break-words leading-relaxed">
           {comment.content}
         </p>
       </div>
@@ -194,7 +195,7 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
                 <img
                   src={imageURL}
                   alt="Profile Preview"
-                  className="w-20 h-20 rounded-full object-cover border-2 border-indigo-500/50"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500/50" // Reduced preview size
                 />
                 <button
                   type="button"
@@ -357,7 +358,7 @@ const Komentar = () => {
           {comments.length === 0 ? (
             <div className="text-center py-10">
               <UserCircle2 className="w-16 h-16 text-indigo-400 mx-auto mb-4 opacity-50" />
-              <p className="text-gray-400 text-xl">
+              <p className="text-lg sm:text-xl text-gray-400">
                 No comments yet. Start the conversation!
               </p>
             </div>
@@ -389,3 +390,4 @@ const Komentar = () => {
 };
 
 export default Komentar;
+
