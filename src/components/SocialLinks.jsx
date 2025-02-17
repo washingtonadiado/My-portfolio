@@ -24,7 +24,7 @@ const socialLinks = [
     displayName: "LinkedIn",
     subText: "@Adiado",
     icon: Linkedin,
-    url: "https://www.linkedin.com/",
+    url: "www.linkedin.com/in/washington-adiado-286607289",
     color: "#0A66C2",
     gradient: "from-[#0A66C2] to-[#0077B5]"
   },
@@ -42,7 +42,7 @@ const socialLinks = [
     displayName: "Github",
     subText: "@Adiado",
     icon: Github,
-    url: "https://github.com",
+    url: "https://github.com/washingtonadiado",
     color: "#ffffff",
     gradient: "from-[#333] to-[#24292e]"
   },
