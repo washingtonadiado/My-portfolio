@@ -15,12 +15,14 @@ const Navbar = () => {
     { href: "#Contact", label: "Contact" },
   ];
 
-  
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
+      // Use a different offset margin based on device type
+      const offsetMargin = isMobile ? 64 : 100;
 
-      if (Date.now() - lastManualScroll.current < 300) return;
+      // If the scroll was manually triggered very recently, skip auto update
+      if (Date.now() - lastManualScroll.current < 600) return;
 
       const sections = navItems
         .map((item) => {
@@ -28,7 +30,7 @@ const Navbar = () => {
           return section
             ? {
                 id: item.href.slice(1),
-                offset: section.offsetTop - 100,
+                offset: section.offsetTop - offsetMargin,
                 height: section.offsetHeight,
               }
             : null;
@@ -39,14 +41,16 @@ const Navbar = () => {
       const active = sections.find(
         (s) => currentScroll >= s.offset && currentScroll < s.offset + s.height
       );
-      if (active) setActiveSection(active.id);
+      if (active) {
+        setActiveSection(active.id);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     // Trigger once on mount
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [navItems]);
+  }, [navItems, isMobile]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -76,14 +80,17 @@ const Navbar = () => {
 
     const section = document.querySelector(href);
     if (section) {
+      const offsetMargin = isMobile ? 64 : 100;
       window.scrollTo({
-        top: section.offsetTop - 100,
+        top: section.offsetTop - offsetMargin,
         behavior: "smooth",
       });
     }
     setIsOpen(false);
   };
 
+  // Use a fully opaque background on mobile or when the menu is open,
+  // and a slightly transparent background on desktop when menu is closed.
   const navBgClass = isOpen || isMobile ? "bg-[#030014]" : "bg-[#030014]/90";
 
   return (
@@ -145,10 +152,17 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu (conditionally rendered) */}
+      {/* Mobile Menu Overlay */}
       {isOpen && (
         <div className="md:hidden fixed inset-0 bg-[#030014] transition-transform duration-300 transform translate-y-0">
-          <div className="px-4 py-6 space-y-4">
+          <div className="px-4 py-6 space-y-4 relative">
+            {/* Close Button inside Mobile Menu */}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="absolute top-4 right-4 p-2 text-[#e2d3fd] hover:text-white"
+            >
+              <X className="w-6 h-6" />
+            </button>
             {navItems.map((item) => {
               const isActive = activeSection === item.href.slice(1);
               return (
@@ -158,9 +172,9 @@ const Navbar = () => {
                   onClick={(e) => scrollToSection(e, item.href)}
                   className={`block px-4 py-3 text-lg font-medium ${
                     isActive
-                      ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent"
+                      ? "text-white font-semibold bg-[#1a1a2e] rounded"
                       : "text-[#e2d3fd] hover:text-white"
-                  }`}   
+                  }`}
                 >
                   {item.label}
                 </a>
