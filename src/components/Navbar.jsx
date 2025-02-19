@@ -15,14 +15,12 @@ const Navbar = () => {
     { href: "#Contact", label: "Contact" },
   ];
 
+  
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
-      // Use a different offset margin based on device type
-      const offsetMargin = isMobile ? 64 : 100;
 
-      // If the scroll was manually triggered very recently, skip auto update
-      if (Date.now() - lastManualScroll.current < 600) return;
+      if (Date.now() - lastManualScroll.current < 300) return;
 
       const sections = navItems
         .map((item) => {
@@ -30,7 +28,7 @@ const Navbar = () => {
           return section
             ? {
                 id: item.href.slice(1),
-                offset: section.offsetTop - offsetMargin,
+                offset: section.offsetTop - 100,
                 height: section.offsetHeight,
               }
             : null;
@@ -41,16 +39,14 @@ const Navbar = () => {
       const active = sections.find(
         (s) => currentScroll >= s.offset && currentScroll < s.offset + s.height
       );
-      if (active) {
-        setActiveSection(active.id);
-      }
+      if (active) setActiveSection(active.id);
     };
 
     window.addEventListener("scroll", handleScroll);
     // Trigger once on mount
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [navItems, isMobile]);
+  }, [navItems]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -80,24 +76,21 @@ const Navbar = () => {
 
     const section = document.querySelector(href);
     if (section) {
-      const offsetMargin = isMobile ? 64 : 100;
       window.scrollTo({
-        top: section.offsetTop - offsetMargin,
+        top: section.offsetTop - 100,
         behavior: "smooth",
       });
     }
     setIsOpen(false);
   };
 
-  // Use a fully opaque background on mobile or when the menu is open,
-  // and a slightly transparent background on desktop when menu is closed.
   const navBgClass = isOpen || isMobile ? "bg-[#030014]" : "bg-[#030014]/90";
 
   return (
     <nav
-      className={`fixed w-full top-0 z-50 transition-all duration-300 ${navBgClass} ${
+      className={fixed w-full top-0 z-50 transition-all duration-300 ${navBgClass} ${
         scrolled ? "backdrop-blur-xl" : ""
-      }`}
+      }}
     >
       <div className="mx-auto px-4 sm:px-6 lg:px-[10%]">
         <div className="flex items-center justify-between h-16">
@@ -123,18 +116,18 @@ const Navbar = () => {
                     className="group relative px-1 py-2 text-sm font-medium"
                   >
                     <span
-                      className={`relative z-10 transition-colors duration-300 ${
+                      className={relative z-10 transition-colors duration-300 ${
                         isActive
                           ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent font-semibold"
                           : "text-[#e2d3fd] group-hover:text-white"
-                      }`}
+                      }}
                     >
                       {item.label}
                     </span>
                     <span
-                      className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#6366f1] to-[#a855f7] transition-transform duration-300 ${
+                      className={absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#6366f1] to-[#a855f7] transition-transform duration-300 ${
                         isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                      }`}
+                      }}
                     />
                   </a>
                 );
@@ -152,17 +145,10 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu (conditionally rendered) */}
       {isOpen && (
         <div className="md:hidden fixed inset-0 bg-[#030014] transition-transform duration-300 transform translate-y-0">
-          <div className="px-4 py-6 space-y-4 relative">
-            {/* Close Button inside Mobile Menu */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 p-2 text-[#e2d3fd] hover:text-white"
-            >
-              <X className="w-6 h-6" />
-            </button>
+          <div className="px-4 py-6 space-y-4">
             {navItems.map((item) => {
               const isActive = activeSection === item.href.slice(1);
               return (
@@ -170,11 +156,11 @@ const Navbar = () => {
                   key={item.label}
                   href={item.href}
                   onClick={(e) => scrollToSection(e, item.href)}
-                  className={`block px-4 py-3 text-lg font-medium ${
+                  className={block px-4 py-3 text-lg font-medium ${
                     isActive
-                      ? "text-white font-semibold bg-[#1a1a2e] rounded"
+                      ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent"
                       : "text-[#e2d3fd] hover:text-white"
-                  }`}
+                  }}   
                 >
                   {item.label}
                 </a>
