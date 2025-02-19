@@ -1,132 +1,134 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react";
 
 const AnimatedBackground = () => {
-    const blobRefs = useRef([])
-    const canvasRef = useRef(null)
-    const starsRef = useRef([])
-    const animationFrameId = useRef(null)
-    const initialPositions = [
-        { x: -4, y: 0 },
-        { x: -4, y: 0 },
-        { x: 20, y: -8 },
-        { x: 20, y: -8 },
-    ]
+  const blobRefs = useRef([]);
+  const canvasRef = useRef(null);
+  const initialPositions = [
+    { x: -4, y: 0 },
+    { x: -4, y: 0 },
+    { x: 20, y: -8 },
+    { x: 20, y: -8 },
+  ];
 
-    // Star background animation
-    useEffect(() => {
-        const canvas = canvasRef.current
-        const ctx = canvas.getContext("2d")
-        
-        const resizeCanvas = () => {
-            canvas.width = window.innerWidth
-            canvas.height = window.innerHeight
+  // Blob scroll animation effect
+  useEffect(() => {
+    let currentScroll = 0;
+    let scrollAnimationId;
+
+    const handleScroll = () => {
+      const newScroll = window.pageYOffset;
+      currentScroll = newScroll;
+
+      blobRefs.current.forEach((blob, index) => {
+        if (!blob) return;
+        const initialPos = initialPositions[index];
+
+        // Calculate movement using sine/cosine for fluid motion
+        const xOffset = Math.sin(newScroll / 100 + index * 0.5) * 340;
+        const yOffset = Math.cos(newScroll / 100 + index * 0.5) * 40;
+        const x = initialPos.x + xOffset;
+        const y = initialPos.y + yOffset;
+
+        blob.style.transform = `translate(${x}px, ${y}px)`;
+        blob.style.transition = "transform 1.4s ease-out";
+      });
+
+      scrollAnimationId = requestAnimationFrame(handleScroll);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    // Kick off the animation in case there’s an initial scroll position
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(scrollAnimationId);
+    };
+  }, []);
+
+  // Starfield animation effect
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let stars = [];
+    const numStars = 100;
+    let starAnimationId;
+
+    // Function to resize the canvas to fill the window
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    // Initialize stars with random positions, sizes, and speeds
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5,
+        speed: Math.random() * 0.5 + 0.2,
+      });
+    }
+
+    // Animation loop to update and render stars continuously
+    const animateStars = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach((star) => {
+        star.y += star.speed;
+        // Wrap star to the top if it moves off the bottom
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
         }
-        
-        const initStars = () => {
-            starsRef.current = []
-            const numberOfStars = window.innerWidth < 768 ? 50 : 100
-            for (let i = 0; i < numberOfStars; i++) {
-                starsRef.current.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    radius: Math.random() * 1.5,
-                    opacity: Math.random(),
-                    velocity: Math.random() * 0.02
-                })
-            }
-        }
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.fill();
+      });
+      starAnimationId = requestAnimationFrame(animateStars);
+    };
 
-        const animate = () => {
-            ctx.fillStyle = "#0f172a" // Match the dark background color
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-            
-            starsRef.current.forEach(star => {
-                star.opacity += star.velocity
-                if (star.opacity > 1 || star.opacity < 0) {
-                    star.velocity = -star.velocity
-                }
-                ctx.beginPath()
-                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2)
-                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`
-                ctx.fill()
-            })
-            
-            animationFrameId.current = requestAnimationFrame(animate)
-        }
+    animateStars();
 
-        // Initial setup
-        resizeCanvas()
-        initStars()
-        animate()
+    return () => {
+      window.removeEventListener("resize", resizeCanvas);
+      cancelAnimationFrame(starAnimationId);
+    };
+  }, []);
 
-        // Handle window resize
-        const handleResize = () => {
-            resizeCanvas()
-            initStars()
-        }
-        window.addEventListener("resize", handleResize)
+  return (
+    <div className="fixed inset-0">
+      {/* Starfield background */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 z-0"
+        style={{ background: "#000" }}
+      />
+      {/* Blobs container */}
+      <div className="absolute inset-0">
+        <div
+          ref={(ref) => (blobRefs.current[0] = ref)}
+          className="absolute top-0 -left-4 md:w-96 md:h-96 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20"
+        ></div>
+        <div
+          ref={(ref) => (blobRefs.current[1] = ref)}
+          className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20 hidden sm:block"
+        ></div>
+        <div
+          ref={(ref) => (blobRefs.current[2] = ref)}
+          className="absolute -bottom-8 left-[-40%] md:left-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20"
+        ></div>
+        <div
+          ref={(ref) => (blobRefs.current[3] = ref)}
+          className="absolute -bottom-10 right-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 md:opacity-10 hidden sm:block"
+        ></div>
+      </div>
+    </div>
+  );
+};
 
-        return () => {
-            window.removeEventListener("resize", handleResize)
-            cancelAnimationFrame(animationFrameId.current)
-        }
-    }, [])
+export default AnimatedBackground;
 
-    // Blob scroll animation
-    useEffect(() => {
-        let currentScroll = 0
-        let requestId
-
-        const handleScroll = () => {
-            const newScroll = window.pageYOffset
-            const scrollDelta = newScroll - currentScroll
-            currentScroll = newScroll
-
-            blobRefs.current.forEach((blob, index) => {
-                const initialPos = initialPositions[index]
-                const xOffset = Math.sin(newScroll / 100 + index * 0.5) * 340
-                const yOffset = Math.cos(newScroll / 100 + index * 0.5) * 40
-                const x = initialPos.x + xOffset
-                const y = initialPos.y + yOffset
-
-                blob.style.transform = `translate(${x}px, ${y}px)`
-                blob.style.transition = "transform 1.4s ease-out"
-            })
-
-            requestId = requestAnimationFrame(handleScroll)
-        }
-
-        window.addEventListener("scroll", handleScroll)
-        return () => {
-            window.removeEventListener("scroll", handleScroll)
-            cancelAnimationFrame(requestId)
-        }
-    }, [])
-
-    return (
-        <div className="fixed inset-0">
-            <canvas ref={canvasRef} className="fixed inset-0" />
-            <div className="absolute inset-0">
-                <div
-                    ref={ref => (blobRefs.current[0] = ref)}
-                    className="absolute top-0 -left-4 md:w-96 md:h-96 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20"
-                />
-                <div
-                    ref={ref => (blobRefs.current[1] = ref)}
-                    className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20 hidden sm:block"
-                />
-                <div
-                    ref={ref => (blobRefs.current[2] = ref)}
-                    className="absolute -bottom-8 left-[-40%] md:left-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20"
-                />
-                <div
-                    ref={ref => (blobRefs.current[3] = ref)}
-                    className="absolute -bottom-10 right-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 md:opacity-10 hidden sm:block"
-                />
-            </div>
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f10_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f10_1px,transparent_1px)] bg-[size:24px_24px]" />
-        </div>
-    )
-}
-
-export default AnimatedBackground
