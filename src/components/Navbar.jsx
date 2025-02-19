@@ -83,7 +83,8 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
-  const navBgClass = isOpen || isMobile ? "bg-[#030014]" : "bg-[#030014]/90";
+  // Always use solid background regardless of section
+  const navBgClass = "bg-[#030014]";
 
   return (
     <nav
