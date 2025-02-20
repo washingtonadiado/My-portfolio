@@ -7,13 +7,7 @@ import {
   orderBy,
   serverTimestamp,
 } from 'firebase/firestore';
-import {
-  onAuthStateChanged,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-} from 'firebase/auth';
-import { db, auth } from '../firebase'; // Ensure your firebase file exports both db and auth
+import { db } from '../firebase-comment';
 import {
   MessageCircle,
   UserCircle2,
@@ -26,7 +20,6 @@ import {
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-// Comment component remains unchanged.
 const Comment = memo(({ comment, formatDate }) => (
   <div className="p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:shadow-lg hover:-translate-y-0.5">
     <div className="flex items-start gap-4">
@@ -35,15 +28,16 @@ const Comment = memo(({ comment, formatDate }) => (
           <img
             src={comment.imageURL}
             alt={`${comment.userName}'s profile`}
-            className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500"
+            className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500" // Reduced size
           />
         ) : (
           <div className="p-2 rounded-full bg-indigo-500/20 text-indigo-400 group-hover:bg-indigo-500/30 transition-colors">
-            <UserCircle2 className="w-6 h-6" />
+            <UserCircle2 className="w-6 h-6" /> {/* Reduced size */}
           </div>
         )}
       </div>
       <div className="flex-grow min-w-0">
+        {/* Header with name and time */}
         <div className="flex items-center gap-2 mb-2">
           <div className="flex-1">
             <h4 className="font-semibold text-white text-lg sm:text-xl">
@@ -67,16 +61,16 @@ const Comment = memo(({ comment, formatDate }) => (
   </div>
 ));
 
-// CommentForm remains mostly unchanged.
 const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
   const [newComment, setNewComment] = useState('');
+  const [userName, setUserName] = useState('');
   const [profession, setProfession] = useState('');
   const [imageURL, setImageURL] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const textareaRef = useRef(null);
   const widgetRef = useRef(null);
 
-  // Initialize Cloudinary widget for profile picture uploads.
+  // Initialize Cloudinary widget for uploading profile pictures.
   useEffect(() => {
     const initializeCloudinary = () => {
       if (window.cloudinary) {
@@ -84,11 +78,15 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
           {
             cloudName: 'det8n0pcv',
             uploadPreset: 'portfolio',
+            // Use server-side cropping so that only the cropped image is saved.
+            // IMPORTANT: Ensure that your Cloudinary upload preset is configured with an incoming transformation
+            // (for example, set "Resize & crop" to "Crop" with "Gravity" set to "Custom").
             cropping: 'server',
             croppingCoordinatesMode: 'custom',
             croppingAspectRatio: 1,
             showSkipCropButton: false,
-            multiple: false,
+            multiple: false, // Must be false to allow interactive cropping
+            // Limit to local uploads (this helps enforce the cropping UI on mobile)
             sources: ['local'],
             maxFileSize: 5000000,
           },
@@ -103,6 +101,7 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
                 setImageURL(result.info.secure_url);
                 setUploadingImage(false);
               } else if (result.event === 'close') {
+                // User canceled the upload
                 setUploadingImage(false);
               }
             }
@@ -133,18 +132,33 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      if (!newComment.trim()) return;
-      onSubmit({ newComment, profession, imageURL });
+      if (!newComment.trim() || !userName.trim()) return;
+      onSubmit({ newComment, userName, profession, imageURL });
       setNewComment('');
+      setUserName('');
       setProfession('');
       setImageURL(null);
       if (textareaRef.current) textareaRef.current.style.height = 'auto';
     },
-    [newComment, profession, imageURL, onSubmit]
+    [newComment, userName, profession, imageURL, onSubmit]
   );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2" data-aos="fade-up" data-aos-duration="1000">
+        <label className="block text-lg font-medium text-white">
+          Name <span className="text-red-400">*</span>
+        </label>
+        <input
+          type="text"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+          placeholder="Enter your name"
+          className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-lg"
+          required
+        />
+      </div>
+
       <div className="space-y-2" data-aos="fade-up" data-aos-duration="1200">
         <label className="block text-lg font-medium text-white">
           Message <span className="text-red-400">*</span>
@@ -183,7 +197,7 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
                 <img
                   src={imageURL}
                   alt="Profile Preview"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500/50"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500/50" // Reduced preview size
                 />
                 <button
                   type="button"
@@ -242,15 +256,6 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
           )}
         </div>
       </button>
-      {error && (
-        <div
-          className="text-red-400 text-lg mt-2"
-          data-aos="fade-up"
-          data-aos-duration="1000"
-        >
-          {error}
-        </div>
-      )}
     </form>
   );
 });
@@ -259,68 +264,32 @@ const Komentar = () => {
   const [comments, setComments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     AOS.init({ once: false, duration: 1000 });
   }, []);
 
-  // Listen for authentication state changes.
-  useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return unsubscribeAuth;
-  }, []);
-
-  // Listen for comments updates.
   useEffect(() => {
     const commentsRef = collection(db, 'portfolio-comments');
     const q = query(commentsRef, orderBy('createdAt', 'desc'));
 
-    const unsubscribeComments = onSnapshot(q, (querySnapshot) => {
+    return onSnapshot(q, (querySnapshot) => {
       const commentsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setComments(commentsData);
     });
-    return unsubscribeComments;
   }, []);
 
-  // Authentication handlers.
-  const handleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error signing in:', error);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
-
-  // When posting a comment, trigger Google sign in if user is not authenticated.
   const handleCommentSubmit = useCallback(
-    async ({ newComment, profession, imageURL }) => {
-      if (!user) {
-        await handleSignIn();
-        alert("Please click 'Post Comment' again after signing in.");
-        return;
-      }
+    async ({ newComment, userName, profession, imageURL }) => {
       setError('');
       setIsSubmitting(true);
       try {
         await addDoc(collection(db, 'portfolio-comments'), {
           content: newComment,
-          userName: user.displayName,
-          userId: user.uid,
+          userName,
           profession: profession.trim() || null,
           imageURL: imageURL || null,
           createdAt: serverTimestamp(),
@@ -332,7 +301,7 @@ const Komentar = () => {
         setIsSubmitting(false);
       }
     },
-    [user]
+    []
   );
 
   const formatDate = useCallback((timestamp) => {
@@ -360,7 +329,7 @@ const Komentar = () => {
       className="w-full bg-gradient-to-b from-white/10 to-white/5 rounded-2xl overflow-hidden backdrop-blur-xl shadow-xl"
       data-aos="fade-up"
     >
-      <div className="p-8 border-b border-white/10 flex items-center justify-between">
+      <div className="p-8 border-b border-white/10">
         <div className="flex items-center gap-4">
           <div className="p-3 rounded-xl bg-indigo-500/20">
             <MessageCircle className="w-8 h-8 text-indigo-400" />
@@ -368,26 +337,6 @@ const Komentar = () => {
           <h3 className="text-2xl font-semibold text-white">
             Comments <span className="text-indigo-400">({comments.length})</span>
           </h3>
-        </div>
-        <div>
-          {user ? (
-            <div className="flex items-center gap-4">
-              <span className="text-white text-lg">Hello, {user.displayName}</span>
-              <button
-                onClick={handleSignOut}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleSignIn}
-              className="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
-            >
-              Sign In with Google
-            </button>
-          )}
         </div>
       </div>
       <div className="p-8 space-y-8">
@@ -442,5 +391,4 @@ const Komentar = () => {
 };
 
 export default Komentar;
-
 
