@@ -12,32 +12,24 @@ const AnimatedBackground = () => {
 
   // Blob scroll animation effect
   useEffect(() => {
-    let currentScroll = 0;
     let scrollAnimationId;
-
     const handleScroll = () => {
-      const newScroll = window.pageYOffset;
-      currentScroll = newScroll;
-
+      const scrollPos = window.pageYOffset;
       blobRefs.current.forEach((blob, index) => {
         if (!blob) return;
         const initialPos = initialPositions[index];
-
-        // Calculate movement using sine/cosine for fluid motion
-        const xOffset = Math.sin(newScroll / 100 + index * 0.5) * 340;
-        const yOffset = Math.cos(newScroll / 100 + index * 0.5) * 40;
+        const xOffset = Math.sin(scrollPos / 100 + index * 0.5) * 340;
+        const yOffset = Math.cos(scrollPos / 100 + index * 0.5) * 40;
         const x = initialPos.x + xOffset;
         const y = initialPos.y + yOffset;
-
         blob.style.transform = `translate(${x}px, ${y}px)`;
         blob.style.transition = "transform 1.4s ease-out";
       });
-
       scrollAnimationId = requestAnimationFrame(handleScroll);
     };
 
     window.addEventListener("scroll", handleScroll);
-    // Kick off the animation in case there’s an initial scroll position
+    // Kick off the animation to set initial positions
     handleScroll();
 
     return () => {
@@ -55,7 +47,7 @@ const AnimatedBackground = () => {
     const numStars = 100;
     let starAnimationId;
 
-    // Function to resize the canvas to fill the window
+    // Resize canvas to fill the viewport
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -63,7 +55,7 @@ const AnimatedBackground = () => {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    // Initialize stars with random positions, sizes, and speeds
+    // Initialize stars with random properties
     for (let i = 0; i < numStars; i++) {
       stars.push({
         x: Math.random() * canvas.width,
@@ -73,12 +65,10 @@ const AnimatedBackground = () => {
       });
     }
 
-    // Animation loop to update and render stars continuously
     const animateStars = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       stars.forEach((star) => {
         star.y += star.speed;
-        // Wrap star to the top if it moves off the bottom
         if (star.y > canvas.height) {
           star.y = 0;
           star.x = Math.random() * canvas.width;
@@ -107,23 +97,27 @@ const AnimatedBackground = () => {
         className="absolute inset-0 z-0"
         style={{ background: "#000" }}
       />
-      {/* Blobs container */}
-      <div className="absolute inset-0">
+      {/* Grid overlay */}
+      <div
+        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(79,79,79,0.0625)_1px,transparent_1px),linear-gradient(to_bottom,rgba(79,79,79,0.0625)_1px,transparent_1px)] bg-[size:24px_24px] z-10"
+      ></div>
+      {/* Blob container */}
+      <div className="absolute inset-0 z-20">
         <div
           ref={(ref) => (blobRefs.current[0] = ref)}
-          className="absolute top-0 -left-4 md:w-96 md:h-96 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20"
+          className="absolute top-0 -left-4 md:w-96 md:h-96 w-72 h-72 bg-purple-500 rounded-full filter blur-[128px] opacity-40 md:opacity-20"
         ></div>
         <div
           ref={(ref) => (blobRefs.current[1] = ref)}
-          className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20 hidden sm:block"
+          className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full filter blur-[128px] opacity-40 md:opacity-20 hidden sm:block"
         ></div>
         <div
           ref={(ref) => (blobRefs.current[2] = ref)}
-          className="absolute -bottom-8 left-[-40%] md:left-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 md:opacity-20"
+          className="absolute -bottom-8 left-[-40%] md:left-20 w-96 h-96 bg-blue-500 rounded-full filter blur-[128px] opacity-40 md:opacity-20"
         ></div>
         <div
           ref={(ref) => (blobRefs.current[3] = ref)}
-          className="absolute -bottom-10 right-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 md:opacity-10 hidden sm:block"
+          className="absolute -bottom-10 right-20 w-96 h-96 bg-blue-500 rounded-full filter blur-[128px] opacity-20 md:opacity-10 hidden sm:block"
         ></div>
       </div>
     </div>
