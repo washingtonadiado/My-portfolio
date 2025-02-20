@@ -8,13 +8,12 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import {
-  getAuth,
   onAuthStateChanged,
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
 } from 'firebase/auth';
-import { db, auth } from '../firebase'; // Ensure your firebase config exports both db and auth
+import { db, auth } from '../firebase'; // Ensure your firebase file exports both db and auth
 import {
   MessageCircle,
   UserCircle2,
@@ -27,7 +26,7 @@ import {
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-// Comment component
+// Comment component remains unchanged.
 const Comment = memo(({ comment, formatDate }) => (
   <div className="p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:shadow-lg hover:-translate-y-0.5">
     <div className="flex items-start gap-4">
@@ -68,7 +67,7 @@ const Comment = memo(({ comment, formatDate }) => (
   </div>
 ));
 
-// Updated CommentForm without the user name input (authenticated user details are used instead)
+// CommentForm remains mostly unchanged.
 const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
   const [newComment, setNewComment] = useState('');
   const [profession, setProfession] = useState('');
@@ -77,7 +76,7 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
   const textareaRef = useRef(null);
   const widgetRef = useRef(null);
 
-  // Initialize Cloudinary widget for uploading profile pictures
+  // Initialize Cloudinary widget for profile picture uploads.
   useEffect(() => {
     const initializeCloudinary = () => {
       if (window.cloudinary) {
@@ -244,7 +243,11 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
         </div>
       </button>
       {error && (
-        <div className="text-red-400 text-lg mt-2" data-aos="fade-up" data-aos-duration="1000">
+        <div
+          className="text-red-400 text-lg mt-2"
+          data-aos="fade-up"
+          data-aos-duration="1000"
+        >
           {error}
         </div>
       )}
@@ -258,12 +261,11 @@ const Komentar = () => {
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
 
-  // Initialize AOS for animations
   useEffect(() => {
     AOS.init({ once: false, duration: 1000 });
   }, []);
 
-  // Listen for authentication state changes
+  // Listen for authentication state changes.
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -271,7 +273,7 @@ const Komentar = () => {
     return unsubscribeAuth;
   }, []);
 
-  // Listen for comments updates
+  // Listen for comments updates.
   useEffect(() => {
     const commentsRef = collection(db, 'portfolio-comments');
     const q = query(commentsRef, orderBy('createdAt', 'desc'));
@@ -286,10 +288,30 @@ const Komentar = () => {
     return unsubscribeComments;
   }, []);
 
+  // Authentication handlers.
+  const handleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error('Error signing in:', error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  // When posting a comment, trigger Google sign in if user is not authenticated.
   const handleCommentSubmit = useCallback(
     async ({ newComment, profession, imageURL }) => {
       if (!user) {
-        alert('You must be signed in to post a comment.');
+        await handleSignIn();
+        alert("Please click 'Post Comment' again after signing in.");
         return;
       }
       setError('');
@@ -332,24 +354,6 @@ const Komentar = () => {
       day: 'numeric',
     }).format(date);
   }, []);
-
-  // Authentication handlers
-  const handleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error signing in:', error);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
 
   return (
     <div
@@ -394,22 +398,13 @@ const Komentar = () => {
           </div>
         )}
 
-        {user ? (
-          <div>
-            <CommentForm
-              onSubmit={handleCommentSubmit}
-              isSubmitting={isSubmitting}
-              error={error}
-            />
-          </div>
-        ) : (
-          <div className="text-center py-10">
-            <UserCircle2 className="w-16 h-16 text-indigo-400 mx-auto mb-4 opacity-50" />
-            <p className="text-lg sm:text-xl text-gray-400">
-              You must be signed in to post a comment.
-            </p>
-          </div>
-        )}
+        <div>
+          <CommentForm
+            onSubmit={handleCommentSubmit}
+            isSubmitting={isSubmitting}
+            error={error}
+          />
+        </div>
 
         <div className="space-y-6 h-[400px] overflow-y-auto custom-scrollbar">
           {comments.length === 0 ? (
@@ -447,4 +442,5 @@ const Komentar = () => {
 };
 
 export default Komentar;
+
 
