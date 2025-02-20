@@ -1,10 +1,8 @@
-import React, { useState, useEffect, memo, useRef } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { Mail, ExternalLink, Sparkles } from "lucide-react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import $ from "jquery";
-import "jquery.ripples";
 
 // Constants
 const TECH_STACK = [
@@ -88,49 +86,6 @@ const CTAButton = memo(({ href, text, icon: Icon }) => (
   </a>
 ));
 
-// RippleEffect Component
-const RippleEffect = memo(() => {
-  const rippleContainerRef = useRef(null);
-
-  useEffect(() => {
-    const $rippleContainer = $(rippleContainerRef.current);
-
-    $rippleContainer.ripples({
-      resolution: 512,
-      dropRadius: 20,
-      perturbance: 0.04,
-    });
-
-    const handleClick = (e) => {
-      const x = e.pageX - $rippleContainer.offset().left;
-      const y = e.pageY - $rippleContainer.offset().top;
-      $rippleContainer.ripples("drop", x, y, 30, 0.03);
-    };
-
-    $rippleContainer.on("click", handleClick);
-
-    return () => {
-      $rippleContainer.ripples("destroy");
-      $rippleContainer.off("click", handleClick);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={rippleContainerRef}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        zIndex: -1,
-        pointerEvents: "none",
-      }}
-    />
-  );
-});
-
 // Home Component
 const Home = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -169,9 +124,6 @@ const Home = () => {
       className="min-h-screen bg-[#030014] overflow-hidden home-section pt-12 sm:pt-14"
       id="Home"
     >
-      {/* Ripple Effect */}
-      <RippleEffect />
-
       <div
         className={`relative z-10 transition-all duration-1000 ${
           isLoaded ? "opacity-100" : "opacity-0"
