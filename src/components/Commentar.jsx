@@ -21,39 +21,38 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 const Comment = memo(({ comment, formatDate }) => (
-  <div className="p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:shadow-lg hover:-translate-y-0.5">
-    <div className="flex items-start gap-4">
-      <div className="flex-shrink-0">
+  <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:shadow-lg hover:-translate-y-0.5">
+    <div className="flex flex-col items-start">
+      <div className="mb-3">
         {comment.imageURL ? (
           <img
             src={comment.imageURL}
             alt={`${comment.userName}'s profile`}
-            className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500" // Reduced size
+            className="w-10 h-10 rounded-full object-cover border-2 border-indigo-500" // Reduced size
           />
         ) : (
           <div className="p-2 rounded-full bg-indigo-500/20 text-indigo-400 group-hover:bg-indigo-500/30 transition-colors">
-            <UserCircle2 className="w-6 h-6" /> {/* Reduced size */}
+            <UserCircle2 className="w-6 h-6" />
           </div>
         )}
       </div>
-      <div className="flex-grow min-w-0">
-        {/* Header with name and time */}
-        <div className="flex items-center gap-2 mb-2">
-          <div className="flex-1">
-            <h4 className="font-semibold text-white text-lg sm:text-xl">
-              {comment.userName}
-            </h4>
-            {comment.profession && (
-              <span className="text-xs sm:text-sm text-gray-400">
-                {comment.profession}
-              </span>
-            )}
-          </div>
-          <span className="text-xs sm:text-base text-gray-400">
+      <div className="w-full">
+        <div className="mb-1">
+          <h4 className="font-semibold text-white text-base">
+            {comment.userName}
+          </h4>
+          {comment.profession && (
+            <span className="text-xs text-gray-400">
+              {comment.profession}
+            </span>
+          )}
+        </div>
+        <div className="mb-1">
+          <span className="text-xs text-gray-400">
             {formatDate(comment.createdAt)}
           </span>
         </div>
-        <p className="text-gray-300 text-base sm:text-lg break-words leading-relaxed">
+        <p className="text-gray-300 text-sm break-words leading-relaxed">
           {comment.content}
         </p>
       </div>
@@ -78,15 +77,11 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
           {
             cloudName: 'det8n0pcv',
             uploadPreset: 'portfolio',
-            // Use server-side cropping so that only the cropped image is saved.
-            // IMPORTANT: Ensure that your Cloudinary upload preset is configured with an incoming transformation
-            // (for example, set "Resize & crop" to "Crop" with "Gravity" set to "Custom").
             cropping: 'server',
             croppingCoordinatesMode: 'custom',
             croppingAspectRatio: 1,
             showSkipCropButton: false,
-            multiple: false, // Must be false to allow interactive cropping
-            // Limit to local uploads (this helps enforce the cropping UI on mobile)
+            multiple: false,
             sources: ['local'],
             maxFileSize: 5000000,
           },
@@ -101,7 +96,6 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
                 setImageURL(result.info.secure_url);
                 setUploadingImage(false);
               } else if (result.event === 'close') {
-                // User canceled the upload
                 setUploadingImage(false);
               }
             }
@@ -146,7 +140,7 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2" data-aos="fade-up" data-aos-duration="1000">
-        <label className="block text-lg font-medium text-white">
+        <label className="block text-base font-medium text-white">
           Name <span className="text-red-400">*</span>
         </label>
         <input
@@ -154,13 +148,13 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
           placeholder="Enter your name"
-          className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-lg"
+          className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-base"
           required
         />
       </div>
 
       <div className="space-y-2" data-aos="fade-up" data-aos-duration="1200">
-        <label className="block text-lg font-medium text-white">
+        <label className="block text-base font-medium text-white">
           Message <span className="text-red-400">*</span>
         </label>
         <textarea
@@ -168,13 +162,13 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
           value={newComment}
           onChange={handleTextareaChange}
           placeholder="Write your message here..."
-          className="w-full p-5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none min-h-[140px] text-lg"
+          className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none min-h-[120px] text-base"
           required
         />
       </div>
 
       <div className="space-y-2" data-aos="fade-up" data-aos-duration="1400">
-        <label className="block text-lg font-medium text-white">
+        <label className="block text-base font-medium text-white">
           Profession <span className="text-gray-400">(optional)</span>
         </label>
         <input
@@ -182,22 +176,22 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
           value={profession}
           onChange={(e) => setProfession(e.target.value)}
           placeholder="Your role or job title"
-          className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-lg"
+          className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-base"
         />
       </div>
 
       <div className="space-y-2" data-aos="fade-up" data-aos-duration="1600">
-        <label className="block text-lg font-medium text-white">
+        <label className="block text-base font-medium text-white">
           Profile Picture <span className="text-gray-400">(optional)</span>
         </label>
-        <div className="flex items-center gap-4 p-5 bg-white/5 border border-white/10 rounded-xl">
+        <div className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl">
           {imageURL ? (
             <div className="flex items-center gap-4 w-full">
               <div className="relative">
                 <img
                   src={imageURL}
                   alt="Profile Preview"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500/50" // Reduced preview size
+                  className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500/50"
                 />
                 <button
                   type="button"
@@ -229,7 +223,7 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
             </button>
           )}
         </div>
-        <p className="text-center text-gray-400 text-lg mt-2">
+        <p className="text-center text-gray-400 text-base mt-2">
           Max file size: 5MB (JPEG, PNG, WebP)
         </p>
       </div>
@@ -239,7 +233,7 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
         disabled={isSubmitting}
         data-aos="fade-up"
         data-aos-duration="1000"
-        className="relative w-full h-14 bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-xl font-medium text-white overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed text-lg"
+        className="relative w-full h-12 bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-xl font-medium text-white overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed text-base"
       >
         <div className="absolute inset-0 bg-white/20 translate-y-12 group-hover:translate-y-0 transition-transform duration-300" />
         <div className="relative flex items-center justify-center gap-2">
