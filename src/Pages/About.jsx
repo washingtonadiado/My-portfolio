@@ -39,7 +39,7 @@ const ProfileImage = memo(() => (
 
       <div className="relative">
         {/* Updated dimensions: increased width and height */}
-        <div className="w-80 h-80 sm:w-96 sm:h-96 rounded-full overflow-hidden shadow-[0_0_40px_rgba(120,119,198,0.3)] transform transition-all duration-700 group-hover:scale-105">
+        <div className="w-96 h-96 sm:w-[500px] sm:h-[500px] rounded-full overflow-hidden shadow-[0_0_40px_rgba(120,119,198,0.3)] transform transition-all duration-700 group-hover:scale-105">
           <div className="absolute inset-0 border-4 border-white/20 rounded-full z-20 transition-all duration-700 group-hover:border-white/40 group-hover:scale-105" />
 
           {/* Optimized overlay effects - disabled on mobile */}
@@ -294,3 +294,4 @@ const AboutPage = () => {
 };
 
 export default memo(AboutPage);
+
