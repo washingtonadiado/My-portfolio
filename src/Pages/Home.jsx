@@ -172,8 +172,9 @@ const Home = () => {
                   <CTAButton href="#Portfolio" text="Projects" icon={ExternalLink} />
                   <CTAButton href="#Contact" text="Contact" icon={Mail} />
                 </div>
+                {/* SOCIAL_LINKS now appear on all devices */}
                 <div
-                  className="hidden sm:flex gap-4 justify-start"
+                  className="flex gap-4 justify-start"
                   data-aos="fade-up"
                   data-aos-delay="1600"
                 >
@@ -226,3 +227,4 @@ const Home = () => {
 };
 
 export default memo(Home);
+
