@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react"; 
 import { db, collection } from "../firebase";
 import { getDocs } from "firebase/firestore";
 import PropTypes from "prop-types";
@@ -16,47 +16,51 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// Integrated CSS as a string
+// Integrated CSS as a string with circular border animation
 const integratedCSS = `
 .scroll-container {
+  position: relative;
   width: 100%;
   height: 500px;
   background: #07182E;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
   border-radius: 20px;
   padding: 1rem;
+  overflow: hidden;
+  z-index: 0;
 }
 
 .scroll-container::before {
-  content: '';
+  content: "";
   position: absolute;
-  width: 100px;
-  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
-  height: 130%;
-  animation: rotBGimg 3s linear infinite;
-  transition: all 0.2s linear;
-  top: -15%;
-  left: -15%;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: conic-gradient(from 0deg, #00b7ff, #ff30ff, #00b7ff);
+  z-index: -1;
+  border-radius: 22px; /* slightly larger than the container */
+  animation: rotateBorder 4s linear infinite;
 }
 
-@keyframes rotBGimg {
+.scroll-container::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: #07182E;
+  border-radius: 18px;
+  z-index: -1;
+}
+
+@keyframes rotateBorder {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
   }
-}
-
-.scroll-container::after {
-  content: '';
-  position: absolute;
-  background: #07182E;
-  inset: 5px;
-  border-radius: 15px;
 }
 `;
 
@@ -113,11 +117,11 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={`
+        className={\`
           transition-transform 
           duration-300 
-          ${isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"}
-        `}
+          \${isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"}
+        \`}
       >
         <polyline points={isShowingMore ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
       </svg>
@@ -136,8 +140,8 @@ function TabPanel({ children, value, index, ...other }) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
+      id={\`full-width-tabpanel-\${index}\`}
+      aria-labelledby={\`full-width-tab-\${index}\`}
       {...other}
     >
       {value === index && (
@@ -157,8 +161,8 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
   return {
-    id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`,
+    id: \`full-width-tab-\${index}\`,
+    "aria-controls": \`full-width-tabpanel-\${index}\`,
   };
 }
 
