@@ -16,7 +16,7 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// Integrated CSS as a string
+// Integrated CSS with animated border spanning the whole container
 const integratedCSS = `
 .scroll-container {
   width: 100%;
@@ -29,38 +29,37 @@ const integratedCSS = `
   border-radius: 20px;
   padding: 1rem;
 }
-
 .scroll-container::before {
-  content: '';
+  content: "";
   position: absolute;
-  width: 100px;
-  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
-  height: 130%;
-  animation: rotBGimg 3s linear infinite;
-  transition: all 0.2s linear;
-  top: -15%;
-  left: -15%;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, rgb(0,183,255), rgb(255,48,255), rgb(0,183,255), rgb(255,48,255));
+  background-size: 200%;
+  z-index: -1;
+  animation: borderAnimation 3s linear infinite;
+  border-radius: 22px;
 }
-
-@keyframes rotBGimg {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .scroll-container::after {
-  content: '';
+  content: "";
   position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
   background: #07182E;
-  inset: 5px;
-  border-radius: 15px;
+  z-index: 0;
+  border-radius: 18px;
+}
+@keyframes borderAnimation {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 `;
 
-// Inject the CSS into the document head
+// Custom hook to inject CSS into the document head
 const useInjectCSS = (css) => {
   useEffect(() => {
     const styleTag = document.createElement("style");
@@ -173,7 +172,7 @@ const techStacks = [
   { icon: "nodejs.svg", language: "Node JS" },
   { icon: "reactjs.svg", language: "ReactJS" },
   { icon: "kotlin.svg", language: "Kotlin" },
-  { icon: "tailwind.svg", language: "Tailwind css" },
+  { icon: "tailwind.svg", language: "Vite" },
   { icon: "firebase.svg", language: "Firebase" },
 ];
 
@@ -432,5 +431,4 @@ export default function FullWidthTabs() {
     </div>
   );
 }
-
 
