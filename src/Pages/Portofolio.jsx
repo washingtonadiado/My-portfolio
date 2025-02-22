@@ -173,7 +173,7 @@ const techStacks = [
   { icon: "nodejs.svg", language: "Node JS" },
   { icon: "reactjs.svg", language: "ReactJS" },
   { icon: "kotlin.svg", language: "Kotlin" },
-  { icon: "tailwind.svg", language: "Vite" },
+  { icon: "tailwind.svg", language: "Tailwind css" },
   { icon: "firebase.svg", language: "Firebase" },
 ];
 
