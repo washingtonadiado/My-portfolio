@@ -16,7 +16,7 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// Integrated CSS with animated border spanning the whole container
+// Integrated CSS with updated pseudo-elements for a full animated border
 const integratedCSS = `
 .scroll-container {
   width: 100%;
@@ -32,26 +32,26 @@ const integratedCSS = `
 .scroll-container::before {
   content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(45deg, rgb(0,183,255), rgb(255,48,255), rgb(0,183,255), rgb(255,48,255));
   background-size: 200%;
   z-index: -1;
   animation: borderAnimation 3s linear infinite;
-  border-radius: 22px;
+  border-radius: 20px;
 }
 .scroll-container::after {
   content: "";
   position: absolute;
-  top: 2px;
-  left: 2px;
-  right: 2px;
-  bottom: 2px;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
   background: #07182E;
   z-index: 0;
-  border-radius: 18px;
+  border-radius: 16px;
 }
 @keyframes borderAnimation {
   0% { background-position: 0% 50%; }
@@ -59,7 +59,7 @@ const integratedCSS = `
 }
 `;
 
-// Custom hook to inject CSS into the document head
+// Custom hook to inject the CSS into the document head
 const useInjectCSS = (css) => {
   useEffect(() => {
     const styleTag = document.createElement("style");
@@ -431,4 +431,3 @@ export default function FullWidthTabs() {
     </div>
   );
 }
-
