@@ -101,7 +101,7 @@ function a11yProps(index) {
 }
 
 const techStacks = [
-  {icon: "python.png", language: "Python" },
+  { icon: "python.png", language: "Python" },
   { icon: "typescript.svg", language: "Typescript" },
   { icon: "figma.svg", language: "Figma" },
   { icon: "flet.svg", language: "Flet" },
@@ -182,7 +182,7 @@ export default function FullWidthTabs() {
 
   return (
     <div className="md:px-[10%] px-[5%] w-full sm:mt-0 mt-[3rem] bg-[#030014] overflow-hidden" id="Portfolio">
-      {/* Header section - unchanged */}
+      {/* Header section */}
       <div className="text-center pb-10" data-aos="fade-up" data-aos-duration="1000">
         <h2 className="inline-block text-3xl md:text-5xl font-bold text-center mx-auto text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
           <span style={{
@@ -202,7 +202,7 @@ export default function FullWidthTabs() {
       </div>
 
       <Box sx={{ width: "100%" }}>
-        {/* AppBar and Tabs section - unchanged */}
+        {/* AppBar and Tabs section */}
         <AppBar
           position="static"
           elevation={0}
@@ -226,7 +226,6 @@ export default function FullWidthTabs() {
           }}
           className="md:px-4"
         >
-          {/* Tabs remain unchanged */}
           <Tabs
             value={value}
             onChange={handleChange}
@@ -234,7 +233,6 @@ export default function FullWidthTabs() {
             indicatorColor="secondary"
             variant="fullWidth"
             sx={{
-              // Existing styles remain unchanged
               minHeight: "70px",
               "& .MuiTab-root": {
                 fontSize: { xs: "0.9rem", md: "1rem" },
@@ -295,29 +293,38 @@ export default function FullWidthTabs() {
           onChangeIndex={setValue}
         >
           <TabPanel value={value} index={0} dir={theme.direction}>
-            <div className="container mx-auto flex justify-center items-center overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
-                {displayedProjects.map((project, index) => (
-                  <div
-                    key={project.id || index}
-                    data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}
-                    data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
-                  >
-                    <CardProject
-                      Img={project.Img}
-                      Title={project.Title}
-                      Description={project.Description}
-                      Link={project.Link}
-                      id={project.id}
-                    />
-                  </div>
-                ))}
+            <div className="container mx-auto">
+              {/* Scrollable rectangular container for projects */}
+              <div className="h-[500px] overflow-y-auto border border-gray-500 rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
+                  {displayedProjects.map((project, index) => (
+                    <div
+                      key={project.id || index}
+                      data-aos={
+                        index % 3 === 0
+                          ? "fade-up-right"
+                          : index % 3 === 1
+                          ? "fade-up"
+                          : "fade-up-left"
+                      }
+                      data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
+                    >
+                      <CardProject
+                        Img={project.Img}
+                        Title={project.Title}
+                        Description={project.Description}
+                        Link={project.Link}
+                        id={project.id}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             {projects.length > initialItems && (
               <div className="mt-6 w-full flex justify-start">
                 <ToggleButton
-                  onClick={() => toggleShowMore('projects')}
+                  onClick={() => toggleShowMore("projects")}
                   isShowingMore={showAllProjects}
                 />
               </div>
@@ -330,7 +337,13 @@ export default function FullWidthTabs() {
                 {displayedCertificates.map((certificate, index) => (
                   <div
                     key={index}
-                    data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}
+                    data-aos={
+                      index % 3 === 0
+                        ? "fade-up-right"
+                        : index % 3 === 1
+                        ? "fade-up"
+                        : "fade-up-left"
+                    }
                     data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
                   >
                     <Certificate ImgSertif={certificate.Img} />
@@ -341,7 +354,7 @@ export default function FullWidthTabs() {
             {certificates.length > initialItems && (
               <div className="mt-6 w-full flex justify-start">
                 <ToggleButton
-                  onClick={() => toggleShowMore('certificates')}
+                  onClick={() => toggleShowMore("certificates")}
                   isShowingMore={showAllCertificates}
                 />
               </div>
@@ -354,7 +367,13 @@ export default function FullWidthTabs() {
                 {techStacks.map((stack, index) => (
                   <div
                     key={index}
-                    data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}
+                    data-aos={
+                      index % 3 === 0
+                        ? "fade-up-right"
+                        : index % 3 === 1
+                        ? "fade-up"
+                        : "fade-up-left"
+                    }
                     data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
                   >
                     <TechStackIcon TechStackIcon={stack.icon} Language={stack.language} />
@@ -368,3 +387,4 @@ export default function FullWidthTabs() {
     </div>
   );
 }
+
