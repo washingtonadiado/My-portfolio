@@ -15,8 +15,8 @@ const TECH_STACK = [
 ];
 
 const SOCIAL_LINKS = [
-  { icon: Github, link: "https://github.com/EkiZR" },
-  { icon: Linkedin, link: "https://www.linkedin.com/in/ekizr/" },
+  { icon: Github, link: "https://github.com/washingtonadiado" },
+  { icon: Linkedin, link: "https://www.linkedin.com/in/washington-adiado/" },
 ];
 
 // StatusBadge Component
