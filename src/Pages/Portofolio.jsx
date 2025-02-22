@@ -15,7 +15,63 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
-import "../styles/scrollContainer.css"; // Import the CSS for the scrollable container
+
+// Integrated CSS as a string
+const integratedCSS = `
+.scroll-container {
+  width: 100%;
+  height: 500px;
+  background: #07182E;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-radius: 20px;
+  padding: 1rem;
+}
+
+.scroll-container::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+  height: 130%;
+  animation: rotBGimg 3s linear infinite;
+  transition: all 0.2s linear;
+  top: -15%;
+  left: -15%;
+}
+
+@keyframes rotBGimg {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.scroll-container::after {
+  content: '';
+  position: absolute;
+  background: #07182E;
+  inset: 5px;
+  border-radius: 15px;
+}
+`;
+
+// Inject the CSS into the document head
+const useInjectCSS = (css) => {
+  useEffect(() => {
+    const styleTag = document.createElement("style");
+    styleTag.type = "text/css";
+    styleTag.appendChild(document.createTextNode(css));
+    document.head.appendChild(styleTag);
+    return () => {
+      document.head.removeChild(styleTag);
+    };
+  }, [css]);
+};
 
 // Separate ShowMore/ShowLess button component
 const ToggleButton = ({ onClick, isShowingMore }) => (
@@ -69,6 +125,11 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500/50 transition-all duration-300 group-hover:w-full"></span>
   </button>
 );
+
+ToggleButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  isShowingMore: PropTypes.bool.isRequired,
+};
 
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -126,10 +187,12 @@ export default function FullWidthTabs() {
   const isMobile = window.innerWidth < 768;
   const initialItems = isMobile ? 4 : 6;
 
+  // Inject the integrated CSS
+  useInjectCSS(integratedCSS);
+
   useEffect(() => {
-    // Initialize AOS once
     AOS.init({
-      once: false, // Animations occur only once
+      once: false,
     });
   }, []);
 
@@ -154,7 +217,6 @@ export default function FullWidthTabs() {
       setProjects(projectData);
       setCertificates(certificateData);
 
-      // Store in localStorage
       localStorage.setItem("projects", JSON.stringify(projectData));
       localStorage.setItem("certificates", JSON.stringify(certificateData));
     } catch (error) {
@@ -203,7 +265,7 @@ export default function FullWidthTabs() {
       </div>
 
       <Box sx={{ width: "100%" }}>
-        {/* AppBar and Tabs Section */}
+        {/* AppBar and Tabs */}
         <AppBar
           position="static"
           elevation={0}
@@ -370,4 +432,5 @@ export default function FullWidthTabs() {
     </div>
   );
 }
+
 
