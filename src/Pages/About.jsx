@@ -1,5 +1,5 @@
-import React, { useEffect, memo, useMemo } from "react";
-import { FileText, Code, Award, Globe, ArrowUpRight, Sparkles, UserCheck } from "lucide-react";
+import React, { useEffect, memo, useState, useMemo } from "react";
+import { FileText, Code, Award, Globe, ArrowUpRight, Sparkles } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -69,7 +69,7 @@ const ProfileImage = memo(() => (
 ));
 
 const StatCard = memo(({ icon: Icon, color, value, label, description, animation }) => (
-  <div data-aos={animation} data-aos-duration={1300} className="relative group">
+  <div data-aos={animation} data-aos-duration="1300" className="relative group">
     <div className="relative z-10 bg-gray-900/50 backdrop-blur-lg rounded-2xl p-6 border border-white/10 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl h-full flex flex-col justify-between">
       <div className={`absolute -z-10 inset-0 bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}></div>
 
@@ -113,8 +113,15 @@ const StatCard = memo(({ icon: Icon, color, value, label, description, animation
 ));
 
 const AboutPage = () => {
-  // Memoized calculations
-  const { totalProjects, totalCertificates, YearExperience } = useMemo(() => {
+  // State to hold stats
+  const [stats, setStats] = useState({
+    totalProjects: 0,
+    totalCertificates: 0,
+    YearExperience: 0,
+  });
+
+  // Update stats after component mounts so that localStorage is available
+  useEffect(() => {
     const storedProjects = JSON.parse(localStorage.getItem("projects") || "[]");
     const storedCertificates = JSON.parse(localStorage.getItem("certificates") || "[]");
 
@@ -127,14 +134,14 @@ const AboutPage = () => {
         ? 1
         : 0);
 
-    return {
+    setStats({
       totalProjects: storedProjects.length,
       totalCertificates: storedCertificates.length,
       YearExperience: experience,
-    };
+    });
   }, []);
 
-  // Optimized AOS initialization
+  // Initialize AOS and setup resize handler
   useEffect(() => {
     const initAOS = () => {
       AOS.init({
@@ -144,7 +151,6 @@ const AboutPage = () => {
 
     initAOS();
 
-    // Debounced resize handler
     let resizeTimer;
     const handleResize = () => {
       clearTimeout(resizeTimer);
@@ -164,7 +170,7 @@ const AboutPage = () => {
       {
         icon: Code,
         color: "from-[#6366f1] to-[#a855f7]",
-        value: totalProjects,
+        value: stats.totalProjects,
         label: "Total Projects",
         description: "Innovative web solutions crafted",
         animation: "fade-right",
@@ -172,7 +178,7 @@ const AboutPage = () => {
       {
         icon: Award,
         color: "from-[#a855f7] to-[#6366f1]",
-        value: totalCertificates,
+        value: stats.totalCertificates,
         label: "Certificates",
         description: "Professional skills validated",
         animation: "fade-up",
@@ -180,13 +186,13 @@ const AboutPage = () => {
       {
         icon: Globe,
         color: "from-[#6366f1] to-[#a855f7]",
-        value: YearExperience,
+        value: stats.YearExperience,
         label: "Years of Experience",
         description: "Continuous learning journey",
         animation: "fade-left",
       },
     ],
-    [totalProjects, totalCertificates, YearExperience]
+    [stats]
   );
 
   return (
@@ -216,7 +222,6 @@ const AboutPage = () => {
               </span>
             </h2>
 
-            {/* Modified paragraph with minimized font size */}
             <p
               className="text-sm sm:text-base lg:text-lg text-gray-400 leading-relaxed text-justify pb-4 sm:pb-0"
               data-aos="fade-right"
@@ -226,19 +231,19 @@ const AboutPage = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7] font-medium">
                 BSc in Mathematics and Computer Science
               </span>{" "}
-              with a deep passion for web development, cybersecurity, artificial intelligence and data science allowing me to build secure and high-performance applications.
+              with a deep passion for web development, cybersecurity, artificial intelligence, and data science allowing me to build secure and high-performance applications.
               <br />
               <br />
               As the{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7] font-medium">
                 Founder of Technetium Kenya
               </span>
-              , I lead a team of talented developers, driving innovation and excellence in web development, software solutions and UI/UX design. My leadership focuses on creating impactful digital experiences, optimizing performance and ensuring the highest security standards.
+              , I lead a team of talented developers, driving innovation and excellence in web development, software solutions, and UI/UX design. My leadership focuses on creating impactful digital experiences, optimizing performance and ensuring the highest security standards.
               <br />
               <br />
               I continuously refine my skills, having completed{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7] font-medium">
-                Udemy courses in Figma UI/UX design, Data Science and Android &amp; Kotlin App Development
+                Udemy courses in Figma UI/UX design, Data Science, and Android &amp; Kotlin App Development
               </span>
               , broadening my ability to develop solutions across multiple platforms. Passionate about technology and creative problem-solving, I am committed to building future-ready digital products that make a difference.
             </p>
@@ -298,4 +303,3 @@ const AboutPage = () => {
 };
 
 export default memo(AboutPage);
-
