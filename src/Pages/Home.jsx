@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo } from "react";
-import { Mail, ExternalLink, Sparkles } from "lucide-react";
+import { Github, Linkedin, Mail, ExternalLink, Sparkles } from "lucide-react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -12,6 +12,11 @@ const TECH_STACK = [
   "Software development",
   "Cyber Security",
   "Data science",
+];
+
+const SOCIAL_LINKS = [
+  { icon: Github, link: "https://github.com/EkiZR" },
+  { icon: Linkedin, link: "https://www.linkedin.com/in/ekizr/" },
 ];
 
 // StatusBadge Component
@@ -75,12 +80,22 @@ const CTAButton = memo(({ href, text, icon: Icon }) => (
           </span>
           <Icon
             className={`w-4 h-4 text-gray-200 ${
-              text === "Contact"
-                ? "group-hover:translate-x-1"
-                : "group-hover:rotate-45"
+              text === "Contact" ? "group-hover:translate-x-1" : "group-hover:rotate-45"
             } transform transition-all duration-300 z-10`}
           />
         </span>
+      </div>
+    </button>
+  </a>
+));
+
+// SocialLink Component
+const SocialLink = memo(({ icon: Icon, link }) => (
+  <a href={link} target="_blank" rel="noopener noreferrer">
+    <button className="group relative p-3">
+      <div className="absolute inset-0 bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
+      <div className="relative rounded-xl bg-black/50 backdrop-blur-xl p-2 flex items-center justify-center border border-white/10 group-hover:border-white/20 transition-all duration-300">
+        <Icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
       </div>
     </button>
   </a>
@@ -156,6 +171,15 @@ const Home = () => {
                 >
                   <CTAButton href="#Portfolio" text="Projects" icon={ExternalLink} />
                   <CTAButton href="#Contact" text="Contact" icon={Mail} />
+                </div>
+                <div
+                  className="hidden sm:flex gap-4 justify-start"
+                  data-aos="fade-up"
+                  data-aos-delay="1600"
+                >
+                  {SOCIAL_LINKS.map((social, index) => (
+                    <SocialLink key={index} {...social} />
+                  ))}
                 </div>
               </div>
             </div>
