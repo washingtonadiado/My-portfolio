@@ -1,4 +1,4 @@
-import React, { useEffect, memo, useState, useMemo } from "react";
+import React, { useEffect, memo, useMemo } from "react";
 import { FileText, Code, Award, Globe, ArrowUpRight, Sparkles } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -113,33 +113,10 @@ const StatCard = memo(({ icon: Icon, color, value, label, description, animation
 ));
 
 const AboutPage = () => {
-  // State to hold stats
-  const [stats, setStats] = useState({
-    totalProjects: 0,
-    totalCertificates: 0,
-    YearExperience: 0,
-  });
-
-  // Update stats after component mounts so that localStorage is available
-  useEffect(() => {
-    const storedProjects = JSON.parse(localStorage.getItem("projects") || "[]");
-    const storedCertificates = JSON.parse(localStorage.getItem("certificates") || "[]");
-
-    const startDate = new Date("2021-11-06");
-    const today = new Date();
-    const experience =
-      today.getFullYear() -
-      startDate.getFullYear() -
-      (today < new Date(today.getFullYear(), startDate.getMonth(), startDate.getDate())
-        ? 1
-        : 0);
-
-    setStats({
-      totalProjects: storedProjects.length,
-      totalCertificates: storedCertificates.length,
-      YearExperience: experience,
-    });
-  }, []);
+  // Hardcoded values for the stats
+  const totalProjects = 6; // manually set number of projects
+  const totalCertificates = 3; // manually set number of certificates
+  const YearExperience = 3; // manually set years of experience
 
   // Initialize AOS and setup resize handler
   useEffect(() => {
@@ -164,13 +141,13 @@ const AboutPage = () => {
     };
   }, []);
 
-  // Memoized stats data
+  // Memoized stats data with hardcoded values
   const statsData = useMemo(
     () => [
       {
         icon: Code,
         color: "from-[#6366f1] to-[#a855f7]",
-        value: stats.totalProjects,
+        value: totalProjects,
         label: "Total Projects",
         description: "Innovative web solutions crafted",
         animation: "fade-right",
@@ -178,7 +155,7 @@ const AboutPage = () => {
       {
         icon: Award,
         color: "from-[#a855f7] to-[#6366f1]",
-        value: stats.totalCertificates,
+        value: totalCertificates,
         label: "Certificates",
         description: "Professional skills validated",
         animation: "fade-up",
@@ -186,13 +163,13 @@ const AboutPage = () => {
       {
         icon: Globe,
         color: "from-[#6366f1] to-[#a855f7]",
-        value: stats.YearExperience,
+        value: YearExperience,
         label: "Years of Experience",
         description: "Continuous learning journey",
         animation: "fade-left",
       },
     ],
-    [stats]
+    [totalProjects, totalCertificates, YearExperience]
   );
 
   return (
