@@ -16,7 +16,7 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// Integrated CSS with updated pseudo-elements for a full animated border
+// Integrated CSS as a string
 const integratedCSS = `
 .scroll-container {
   width: 100%;
@@ -29,37 +29,38 @@ const integratedCSS = `
   border-radius: 20px;
   padding: 1rem;
 }
+
 .scroll-container::before {
-  content: "";
+  content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgb(0,183,255), rgb(255,48,255), rgb(0,183,255), rgb(255,48,255));
-  background-size: 200%;
-  z-index: -1;
-  animation: borderAnimation 3s linear infinite;
-  border-radius: 20px;
+  width: 100px;
+  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+  height: 130%;
+  animation: rotBGimg 3s linear infinite;
+  transition: all 0.2s linear;
+  top: -15%;
+  left: -15%;
 }
+
+@keyframes rotBGimg {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .scroll-container::after {
-  content: "";
+  content: '';
   position: absolute;
-  top: 4px;
-  left: 4px;
-  right: 4px;
-  bottom: 4px;
   background: #07182E;
-  z-index: 0;
-  border-radius: 16px;
-}
-@keyframes borderAnimation {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+  inset: 5px;
+  border-radius: 15px;
 }
 `;
 
-// Custom hook to inject the CSS into the document head
+// Inject the CSS into the document head
 const useInjectCSS = (css) => {
   useEffect(() => {
     const styleTag = document.createElement("style");
