@@ -1,453 +1,230 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { db, collection } from "../firebase";
-import { getDocs } from "firebase/firestore";
-import PropTypes from "prop-types";
-import SwipeableViews from "react-swipeable-views";
-import { useTheme } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import CardProject from "../components/CardProject";
-import TechStackIcon from "../components/TechStackIcon";
+import React, { useState, useEffect, memo } from "react";
+import { Github, Linkedin, Mail, ExternalLink, Sparkles } from "lucide-react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import Certificate from "../components/Certificate";
-import { Code, Award, Boxes } from "lucide-react";
 
-// Updated CSS with animated circular border and scrollbar features added
-const integratedCSS = 
-.scroll-container {
-  width: 100%;
-  background: #07182E;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border-radius: 20px;
-  padding: 1rem;
-  isolation: isolate;
-  max-height: 500px; /* Allows scrolling when content exceeds 500px height */
-}
-
-.scroll-container::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(45deg, #00b7ff, #ff30ff, #00b7ff);
-  background-size: 200% 200%;
-  animation: rotBGimg 3s linear infinite;
-  border-radius: 20px;
-  z-index: 1;
-}
-
-@keyframes rotBGimg {
-  0% {
-    transform: rotate(0deg) scale(1.2);
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    transform: rotate(360deg) scale(1.2);
-    background-position: 0% 50%;
-  }
-}
-
-.scroll-container::after {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  background: #07182E;
-  border-radius: 17px;
-  z-index: 2;
-}
-
-.scroll-content {
-  position: relative;
-  z-index: 3;
-}
-
-/* Custom scrollbar styling */
-.scroll-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scroll-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-}
-
-.scroll-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #00b7ff, #ff30ff);
-  border-radius: 4px;
-}
-;
-
-const useInjectCSS = (css) => {
-  useEffect(() => {
-    const styleTag = document.createElement("style");
-    styleTag.type = "text/css";
-    styleTag.appendChild(document.createTextNode(css));
-    document.head.appendChild(styleTag);
-    return () => {
-      document.head.removeChild(styleTag);
-    };
-  }, [css]);
-};
-
-const ToggleButton = ({ onClick, isShowingMore }) => (
-  <button
-    onClick={onClick}
-    className="px-3 py-1.5 text-slate-300 hover:text-white text-sm font-medium transition-all duration-300 ease-in-out flex items-center gap-2 bg-white/5 hover:bg-white/10 rounded-md border border-white/10 hover:border-white/20 backdrop-blur-sm group relative overflow-hidden"
-  >
-    <span className="relative z-10 flex items-center gap-2">
-      {isShowingMore ? "See Less" : "See More"}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={transition-transform duration-300 ${
-          isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"
-        }}
-      >
-        <polyline points={isShowingMore ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
-      </svg>
-    </span>
-    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500/50 transition-all duration-300 group-hover:w-full"></span>
-  </button>
-);
-
-ToggleButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  isShowingMore: PropTypes.bool.isRequired,
-};
-
-function TabPanel({ children, value, index, ...other }) {
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={full-width-tabpanel-${index}}
-      aria-labelledby={full-width-tab-${index}}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: { xs: 1, sm: 3 } }}>
-          <Typography component="div">{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: full-width-tab-${index},
-    "aria-controls": full-width-tabpanel-${index},
-  };
-}
-
-const techStacks = [
-  { icon: "python.png", language: "Python" },
-  { icon: "typescript.svg", language: "Typescript" },
-  { icon: "figma.svg", language: "Figma" },
-  { icon: "flet.svg", language: "Flet" },
-  { icon: "html.svg", language: "HTML" },
-  { icon: "css.svg", language: "CSS" },
-  { icon: "javascript.svg", language: "JavaScript" },
-  { icon: "nodejs.svg", language: "Node JS" },
-  { icon: "reactjs.svg", language: "ReactJS" },
-  { icon: "kotlin.svg", language: "Kotlin" },
-  { icon: "tailwind.svg", language: "Vite" },
-  { icon: "firebase.svg", language: "Firebase" },
+// Constants
+const TECH_STACK = [
+  "Web development",
+  "Graphic design",
+  "UI/UX design",
+  "Software development",
+  "Cyber Security",
+  "Data science",
 ];
 
-export default function FullWidthTabs() {
-  const theme = useTheme();
-  const [value, setValue] = useState(0);
-  const [projects, setProjects] = useState([]);
-  const [certificates, setCertificates] = useState([]);
-  const [showAllProjects, setShowAllProjects] = useState(false);
-  const [showAllCertificates, setShowAllCertificates] = useState(false);
-  const isMobile = window.innerWidth < 768;
-  const initialItems = isMobile ? 4 : 6;
+const SOCIAL_LINKS = [
+  { icon: Github, link: "https://github.com/washingtonadiado" },
+  { icon: Linkedin, link: "https://www.linkedin.com/in/washington-adiado/" },
+];
 
-  useInjectCSS(integratedCSS);
+// StatusBadge Component
+const StatusBadge = memo(() => (
+  <div
+    className="inline-block animate-float mx-auto mt-8 sm:mt-10"
+    data-aos="zoom-in"
+    data-aos-delay="400"
+  >
+    <div className="relative group">
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-full blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+      <div className="relative px-3 sm:px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10">
+        <span className="bg-gradient-to-r from-[#6366f1] to-[#a855f7] text-transparent bg-clip-text sm:text-sm text-[0.7rem] font-medium flex items-center">
+          <Sparkles className="sm:w-4 sm:h-4 w-3 h-3 mr-2 text-blue-400" />
+          Ready to Innovate
+        </span>
+      </div>
+    </div>
+  </div>
+));
+
+// MainTitle Component
+const MainTitle = memo(() => (
+  <div className="space-y-2" data-aos="fade-up" data-aos-delay="600">
+    <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-6xl font-bold tracking-tight">
+      <span className="relative inline-block">
+        <span className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] to-[#a855f7] blur-2xl opacity-20"></span>
+        <span className="relative bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
+          Providing The Best
+        </span>
+      </span>
+      <br />
+      <span className="relative inline-block mt-2">
+        <span className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] to-[#a855f7] blur-2xl opacity-20"></span>
+        <span className="relative bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent">
+          Project Experience
+        </span>
+      </span>
+      <br />
+    </h1>
+  </div>
+));
+
+// TechStack Component
+const TechStack = memo(({ tech }) => (
+  <div className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-gray-300 hover:bg-white/10 transition-colors">
+    {tech}
+  </div>
+));
+
+// CTAButton Component
+const CTAButton = memo(({ href, text, icon: Icon }) => (
+  <a href={href}>
+    <button className="group relative w-[160px]">
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-[#4f52c9] to-[#0a060c] rounded-xl opacity-50 blur-md group-hover:opacity-90 transition-all duration-700"></div>
+      <div className="relative h-11 bg-[#030014] backdrop-blur-xl rounded-lg border border-white/10 leading-none overflow-hidden">
+        <div className="absolute inset-0 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 bg-gradient-to-r from-[#4f52c9]/20 to-[#8644c5]/20"></div>
+        <span className="absolute inset-0 flex items-center justify-center gap-2 text-sm group-hover:gap-3 transition-all duration-300">
+          <span className="bg-gradient-to-r from-gray-200 to-white bg-clip-text text-transparent font-medium z-10">
+            {text}
+          </span>
+          <Icon
+            className={w-4 h-4 text-gray-200 ${
+              text === "Contact" ? "group-hover:translate-x-1" : "group-hover:rotate-45"
+            } transform transition-all duration-300 z-10}
+          />
+        </span>
+      </div>
+    </button>
+  </a>
+));
+
+// SocialLink Component
+const SocialLink = memo(({ icon: Icon, link }) => (
+  <a href={link} target="_blank" rel="noopener noreferrer">
+    <button className="group relative p-3">
+      <div className="absolute inset-0 bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
+      <div className="relative rounded-xl bg-black/50 backdrop-blur-xl p-2 flex items-center justify-center border border-white/10 group-hover:border-white/20 transition-all duration-300">
+        <Icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+      </div>
+    </button>
+  </a>
+));
+
+// Home Component
+const Home = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     AOS.init({
-      once: false,
+      once: true,
+      offset: 10,
     });
   }, []);
 
-  const fetchData = useCallback(async () => {
-    try {
-      const projectCollection = collection(db, "projects");
-      const certificateCollection = collection(db, "certificates");
-
-      const [projectSnapshot, certificateSnapshot] = await Promise.all([
-        getDocs(projectCollection),
-        getDocs(certificateCollection),
-      ]);
-
-      const projectData = projectSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        TechStack: doc.data().TechStack || [],
-      }));
-
-      const certificateData = certificateSnapshot.docs.map((doc) => doc.data());
-
-      setProjects(projectData);
-      setCertificates(certificateData);
-
-      localStorage.setItem("projects", JSON.stringify(projectData));
-      localStorage.setItem("certificates", JSON.stringify(certificateData));
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+  useEffect(() => {
+    setIsLoaded(true);
+    return () => setIsLoaded(false);
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const lottieOptions = {
+    src: "https://lottie.host/58753882-bb6a-49f5-a2c0-950eda1e135a/NLbpVqGegK.lottie",
+    loop: true,
+    autoplay: true,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+      progressiveLoad: true,
+    },
+    style: { width: "100%", height: "100%" },
+    className: w-full h-full transition-all duration-500 ${
+      isHovering
+        ? "scale-[180%] sm:scale-[160%] md:scale-[150%] lg:scale-[145%] rotate-2"
+        : "scale-[175%] sm:scale-[155%] md:scale-[145%] lg:scale-[140%]"
+    },
   };
 
-  const toggleShowMore = useCallback((type) => {
-    if (type === "projects") {
-      setShowAllProjects((prev) => !prev);
-    } else {
-      setShowAllCertificates((prev) => !prev);
-    }
-  }, []);
-
-  const displayedProjects = showAllProjects ? projects : projects.slice(0, initialItems);
-  const displayedCertificates = showAllCertificates ? certificates : certificates.slice(0, initialItems);
-
   return (
-    <div className="md:px-[10%] px-[5%] w-full sm:mt-0 mt-[3rem] bg-[#030014]" id="Portfolio">
-      <div className="text-center pb-10" data-aos="fade-up" data-aos-duration="1000">
-        <h2 className="inline-block text-3xl md:text-5xl font-bold mx-auto text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
-          Portfolio Showcase
-        </h2>
-        <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base mt-2">
-          Explore my journey through projects, certifications, and technical expertise.
-        </p>
+    <div
+      className="min-h-screen bg-[#030014] overflow-hidden home-section pt-12 sm:pt-14"
+      id="Home"
+    >
+      <div
+        className={relative z-10 transition-all duration-1000 ${
+          isLoaded ? "opacity-100" : "opacity-0"
+        }}
+      >
+        <div className="container mx-auto px-[5%] sm:px-6 lg:px-0 min-h-screen">
+          <div className="flex flex-col lg:flex-row items-center justify-center h-screen md:justify-between gap-0 sm:gap-10 lg:gap-16">
+            {/* Left Column */}
+            <div
+              className="w-full lg:w-1/2 space-y-4 sm:space-y-6 text-left lg:text-left order-1 lg:order-1 lg:mt-0"
+              data-aos="fade-right"
+              data-aos-delay="200"
+            >
+              <div className="space-y-3 sm:space-y-5">
+                <StatusBadge />
+                <MainTitle />
+                <div
+                  className="flex flex-wrap gap-2 sm:gap-3 justify-start"
+                  data-aos="fade-up"
+                  data-aos-delay="1200"
+                >
+                  {TECH_STACK.map((tech, index) => (
+                    <TechStack key={index} tech={tech} />
+                  ))}
+                </div>
+                <div
+                  className="flex flex-row gap-3 w-full justify-start"
+                  data-aos="fade-up"
+                  data-aos-delay="1400"
+                >
+                  <CTAButton href="#Portfolio" text="Projects" icon={ExternalLink} />
+                  <CTAButton href="#Contact" text="Contact" icon={Mail} />
+                </div>
+                {/* SOCIAL_LINKS now appear on all devices */}
+                <div
+                  className="flex gap-4 justify-start"
+                  data-aos="fade-up"
+                  data-aos-delay="1600"
+                >
+                  {SOCIAL_LINKS.map((social, index) => (
+                    <SocialLink key={index} {...social} />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div
+              className="w-full py-[8%] sm:py-0 lg:w-1/2 h-auto lg:h-[580px] xl:h-[700px] relative flex items-center justify-center order-2 lg:order-2 mt-6 lg:mt-0"
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+              data-aos="fade-left"
+              data-aos-delay="600"
+            >
+              <div className="relative w-full opacity-90">
+                <div
+                  className={absolute inset-0 bg-gradient-to-r from-[#6366f1]/10 to-[#a855f7]/10 rounded-3xl blur-3xl transition-all duration-700 ease-in-out ${
+                    isHovering ? "opacity-50 scale-105" : "opacity-20 scale-100"
+                  }}
+                ></div>
+                <div
+                  className={relative z-10 w-full opacity-90 transform transition-transform duration-500 ${
+                    isHovering ? "scale-105" : "scale-100"
+                  }}
+                >
+                  <DotLottieReact {...lottieOptions} />
+                </div>
+                <div
+                  className={absolute inset-0 pointer-events-none transition-all duration-700 ${
+                    isHovering ? "opacity-50" : "opacity-20"
+                  }}
+                >
+                  <div
+                    className={absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] bg-gradient-to-br from-indigo-500/10 to-purple-500/10 blur-3xl animate-[pulse_6s_cubic-bezier(0.4,0,0.6,1)_infinite] transition-all duration-700 ${
+                      isHovering ? "scale-110" : "scale-100"
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <Box sx={{ width: "100%" }}>
-        <AppBar
-          position="static"
-          elevation={0}
-          sx={{
-            bgcolor: "transparent",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            borderRadius: "20px",
-            position: "relative",
-            overflow: "hidden",
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "linear-gradient(180deg, rgba(139, 92, 246, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%)",
-              backdropFilter: "blur(10px)",
-              zIndex: 0,
-            },
-          }}
-          className="md:px-4"
-        >
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            textColor="secondary"
-            indicatorColor="secondary"
-            variant="fullWidth"
-            sx={{
-              minHeight: "70px",
-              "& .MuiTab-root": {
-                fontSize: { xs: "0.9rem", md: "1rem" },
-                fontWeight: "600",
-                color: "#94a3b8",
-                textTransform: "none",
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                padding: "20px 0",
-                zIndex: 1,
-                margin: "8px",
-                borderRadius: "12px",
-                "&:hover": {
-                  color: "#ffffff",
-                  backgroundColor: "rgba(139, 92, 246, 0.1)",
-                  transform: "translateY(-2px)",
-                  "& .lucide": {
-                    transform: "scale(1.1) rotate(5deg)",
-                  },
-                },
-                "&.Mui-selected": {
-                  color: "#fff",
-                  background: "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))",
-                  boxShadow: "0 4px 15px -3px rgba(139, 92, 246, 0.2)",
-                  "& .lucide": {
-                    color: "#a78bfa",
-                  },
-                },
-              },
-              "& .MuiTabs-indicator": {
-                height: 0,
-              },
-              "& .MuiTabs-flexContainer": {
-                gap: "8px",
-              },
-            }}
-          >
-            <Tab icon={<Code className="mb-2 w-5 h-5 transition-all duration-300" />} label="Projects" {...a11yProps(0)} />
-            <Tab icon={<Award className="mb-2 w-5 h-5 transition-all duration-300" />} label="Certificates" {...a11yProps(1)} />
-            <Tab icon={<Boxes className="mb-2 w-5 h-5 transition-all duration-300" />} label="Tech Stack" {...a11yProps(2)} />
-          </Tabs>
-        </AppBar>
-
-        <SwipeableViews
-          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-          index={value}
-          onChangeIndex={setValue}
-        >
-          {/* Projects Tab */}
-          <TabPanel value={value} index={0} dir={theme.direction}>
-            <div className="container mx-auto">
-              <div className="scroll-container">
-                <div className="scroll-content">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
-                    {displayedProjects.map((project, index) => (
-                      <div
-                        key={project.id || index}
-                        data-aos={
-                          index % 3 === 0
-                            ? "fade-up-right"
-                            : index % 3 === 1
-                            ? "fade-up"
-                            : "fade-up-left"
-                        }
-                        data-aos-duration={
-                          index % 3 === 0
-                            ? "1000"
-                            : index % 3 === 1
-                            ? "1200"
-                            : "1000"
-                        }
-                      >
-                        <CardProject
-                          Img={project.Img}
-                          Title={project.Title}
-                          Description={project.Description}
-                          Link={project.Link}
-                          id={project.id}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {projects.length > initialItems && (
-              <div className="mt-6 w-full flex justify-start">
-                <ToggleButton onClick={() => toggleShowMore("projects")} isShowingMore={showAllProjects} />
-              </div>
-            )}
-          </TabPanel>
-
-          {/* Certificates Tab */}
-          <TabPanel value={value} index={1} dir={theme.direction}>
-            <div className="container mx-auto">
-              <div className="scroll-container">
-                <div className="scroll-content">
-                  <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4">
-                    {displayedCertificates.map((certificate, index) => (
-                      <div
-                        key={index}
-                        data-aos={
-                          index % 3 === 0
-                            ? "fade-up-right"
-                            : index % 3 === 1
-                            ? "fade-up"
-                            : "fade-up-left"
-                        }
-                        data-aos-duration={
-                          index % 3 === 0
-                            ? "1000"
-                            : index % 3 === 1
-                            ? "1200"
-                            : "1000"
-                        }
-                      >
-                        <Certificate ImgSertif={certificate.Img} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {certificates.length > initialItems && (
-              <div className="mt-6 w-full flex justify-start">
-                <ToggleButton onClick={() => toggleShowMore("certificates")} isShowingMore={showAllCertificates} />
-              </div>
-            )}
-          </TabPanel>
-
-          {/* Tech Stack Tab */}
-          <TabPanel value={value} index={2} dir={theme.direction}>
-            <div className="container mx-auto pb-[5%]">
-              <div className="scroll-container">
-                <div className="scroll-content">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
-                    {techStacks.map((stack, index) => (
-                      <div
-                        key={index}
-                        data-aos={
-                          index % 3 === 0
-                            ? "fade-up-right"
-                            : index % 3 === 1
-                            ? "fade-up"
-                            : "fade-up-left"
-                        }
-                        data-aos-duration={
-                          index % 3 === 0
-                            ? "1000"
-                            : index % 3 === 1
-                            ? "1200"
-                            : "1000"
-                        }
-                      >
-                        <TechStackIcon TechStackIcon={stack.icon} Language={stack.language} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </TabPanel>
-        </SwipeableViews>
-      </Box>
     </div>
   );
-}
+};
+
+export default memo(Home);
+
