@@ -16,7 +16,7 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// Updated CSS with animated circular border and auto height
+// Updated CSS with animated circular border and scrollbar features added
 const integratedCSS = `
 .scroll-container {
   width: 100%;
@@ -24,10 +24,12 @@ const integratedCSS = `
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   border-radius: 20px;
   padding: 1rem;
   isolation: isolate;
+  max-height: 500px; /* Allows scrolling when content exceeds 500px height */
 }
 
 .scroll-container::before {
@@ -69,7 +71,7 @@ const integratedCSS = `
   z-index: 3;
 }
 
-/* Custom scrollbar styling (if inner scrollbars are needed) */
+/* Custom scrollbar styling */
 .scroll-container::-webkit-scrollbar {
   width: 6px;
 }
