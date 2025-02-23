@@ -16,18 +16,21 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// Updated CSS with animated circular border and auto height
-const integratedCSS = 
+// Updated CSS with animated circular border, smooth scroll and mobile adjustments
+const integratedCSS = `
 .scroll-container {
   width: 100%;
   background: #07182E;
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   border-radius: 20px;
   padding: 1rem;
   isolation: isolate;
+  max-height: 500px; /* Default max-height */
+  scroll-behavior: smooth;
 }
 
 .scroll-container::before {
@@ -69,7 +72,7 @@ const integratedCSS =
   z-index: 3;
 }
 
-/* Custom scrollbar styling (if inner scrollbars are needed) */
+/* Custom scrollbar styling */
 .scroll-container::-webkit-scrollbar {
   width: 6px;
 }
@@ -83,7 +86,14 @@ const integratedCSS =
   background: linear-gradient(45deg, #00b7ff, #ff30ff);
   border-radius: 4px;
 }
-;
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .scroll-container {
+    max-height: 300px;
+  }
+}
+`;
 
 const useInjectCSS = (css) => {
   useEffect(() => {
@@ -114,9 +124,9 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={transition-transform duration-300 ${
+        className={`transition-transform duration-300 ${
           isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"
-        }}
+        }`}
       >
         <polyline points={isShowingMore ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
       </svg>
@@ -135,8 +145,8 @@ function TabPanel({ children, value, index, ...other }) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={full-width-tabpanel-${index}}
-      aria-labelledby={full-width-tab-${index}}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
       {value === index && (
@@ -156,8 +166,8 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
   return {
-    id: full-width-tab-${index},
-    "aria-controls": full-width-tabpanel-${index},
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
 
@@ -183,7 +193,8 @@ export default function FullWidthTabs() {
   const [certificates, setCertificates] = useState([]);
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [showAllCertificates, setShowAllCertificates] = useState(false);
-  const isMobile = window.innerWidth < 768;
+  // Determine if mobile; ensure this runs only on the client
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const initialItems = isMobile ? 4 : 6;
 
   useInjectCSS(integratedCSS);
@@ -191,8 +202,30 @@ export default function FullWidthTabs() {
   useEffect(() => {
     AOS.init({
       once: false,
+      // Optionally, you can disable animations on mobile if desired:
+      // disable: "mobile",
     });
   }, []);
+
+  // Refresh AOS when toggling items so that newly rendered elements animate
+  useEffect(() => {
+    AOS.refresh();
+  }, [showAllProjects, showAllCertificates]);
+
+  // Helper function to determine animation type and duration based on index and device
+  const getAnimationProps = (index) => {
+    let animation = "fade-up";
+    if (index % 3 === 0) animation = "fade-up-right";
+    else if (index % 3 === 2) animation = "fade-up-left";
+    const duration = isMobile
+      ? index % 3 === 1
+        ? "800"
+        : "600"
+      : index % 3 === 1
+      ? "1200"
+      : "1000";
+    return { "data-aos": animation, "data-aos-duration": duration };
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -336,33 +369,20 @@ export default function FullWidthTabs() {
               <div className="scroll-container">
                 <div className="scroll-content">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
-                    {displayedProjects.map((project, index) => (
-                      <div
-                        key={project.id || index}
-                        data-aos={
-                          index % 3 === 0
-                            ? "fade-up-right"
-                            : index % 3 === 1
-                            ? "fade-up"
-                            : "fade-up-left"
-                        }
-                        data-aos-duration={
-                          index % 3 === 0
-                            ? "1000"
-                            : index % 3 === 1
-                            ? "1200"
-                            : "1000"
-                        }
-                      >
-                        <CardProject
-                          Img={project.Img}
-                          Title={project.Title}
-                          Description={project.Description}
-                          Link={project.Link}
-                          id={project.id}
-                        />
-                      </div>
-                    ))}
+                    {displayedProjects.map((project, index) => {
+                      const animationProps = getAnimationProps(index);
+                      return (
+                        <div key={project.id || index} {...animationProps}>
+                          <CardProject
+                            Img={project.Img}
+                            Title={project.Title}
+                            Description={project.Description}
+                            Link={project.Link}
+                            id={project.id}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -380,27 +400,14 @@ export default function FullWidthTabs() {
               <div className="scroll-container">
                 <div className="scroll-content">
                   <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4">
-                    {displayedCertificates.map((certificate, index) => (
-                      <div
-                        key={index}
-                        data-aos={
-                          index % 3 === 0
-                            ? "fade-up-right"
-                            : index % 3 === 1
-                            ? "fade-up"
-                            : "fade-up-left"
-                        }
-                        data-aos-duration={
-                          index % 3 === 0
-                            ? "1000"
-                            : index % 3 === 1
-                            ? "1200"
-                            : "1000"
-                        }
-                      >
-                        <Certificate ImgSertif={certificate.Img} />
-                      </div>
-                    ))}
+                    {displayedCertificates.map((certificate, index) => {
+                      const animationProps = getAnimationProps(index);
+                      return (
+                        <div key={index} {...animationProps}>
+                          <Certificate ImgSertif={certificate.Img} />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -418,27 +425,14 @@ export default function FullWidthTabs() {
               <div className="scroll-container">
                 <div className="scroll-content">
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
-                    {techStacks.map((stack, index) => (
-                      <div
-                        key={index}
-                        data-aos={
-                          index % 3 === 0
-                            ? "fade-up-right"
-                            : index % 3 === 1
-                            ? "fade-up"
-                            : "fade-up-left"
-                        }
-                        data-aos-duration={
-                          index % 3 === 0
-                            ? "1000"
-                            : index % 3 === 1
-                            ? "1200"
-                            : "1000"
-                        }
-                      >
-                        <TechStackIcon TechStackIcon={stack.icon} Language={stack.language} />
-                      </div>
-                    ))}
+                    {techStacks.map((stack, index) => {
+                      const animationProps = getAnimationProps(index);
+                      return (
+                        <div key={index} {...animationProps}>
+                          <TechStackIcon TechStackIcon={stack.icon} Language={stack.language} />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
