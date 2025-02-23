@@ -449,4 +449,3 @@ export default function FullWidthTabs() {
     </div>
   );
 }
-
