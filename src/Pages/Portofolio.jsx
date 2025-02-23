@@ -16,16 +16,19 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-const integratedCSS = `
+// Updated CSS with circular border animation
+const integratedCSS = 
 .scroll-container {
   width: 100%;
+  height: 500px;
   background: #07182E;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
   border-radius: 20px;
-  padding: 2rem;
+  padding: 1rem;
   isolation: isolate;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-  min-height: 400px;
 }
 
 .scroll-container::before {
@@ -40,7 +43,7 @@ const integratedCSS = `
     #00b7ff
   );
   background-size: 200% 200%;
-  animation: rotBGimg 4s linear infinite;
+  animation: rotBGimg 3s linear infinite;
   top: -25%;
   left: -25%;
   border-radius: 20px;
@@ -49,14 +52,14 @@ const integratedCSS = `
 
 @keyframes rotBGimg {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) scale(1.2);
     background-position: 0% 50%;
   }
   50% {
     background-position: 100% 50%;
   }
   100% {
-    transform: rotate(360deg);
+    transform: rotate(360deg) scale(1.2);
     background-position: 0% 50%;
   }
 }
@@ -65,8 +68,8 @@ const integratedCSS = `
   content: '';
   position: absolute;
   background: #07182E;
-  inset: 2px;
-  border-radius: 18px;
+  inset: 3px;
+  border-radius: 17px;
   z-index: 2;
 }
 
@@ -77,28 +80,21 @@ const integratedCSS = `
   width: 100%;
 }
 
-.tech-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 1.5rem;
-  padding: 1rem;
-  place-items: center;
+/* Custom scrollbar */
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
 }
 
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  padding: 1rem;
+.scroll-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
 
-.certificates-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  padding: 1rem;
+.scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #00b7ff, #ff30ff);
+  border-radius: 4px;
 }
-`;
+;
 
 const useInjectCSS = (css) => {
   useEffect(() => {
@@ -106,48 +102,164 @@ const useInjectCSS = (css) => {
     styleTag.type = "text/css";
     styleTag.appendChild(document.createTextNode(css));
     document.head.appendChild(styleTag);
-    return () => document.head.removeChild(styleTag);
+    return () => {
+      document.head.removeChild(styleTag);
+    };
   }, [css]);
 };
 
 const ToggleButton = ({ onClick, isShowingMore }) => (
   <button
     onClick={onClick}
-    className="px-4 py-2 text-slate-200 hover:text-white text-sm font-medium transition-all duration-300 ease-in-out flex items-center gap-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 hover:border-white/20 backdrop-blur-sm group"
+    className="px-3 py-1.5 text-slate-300 hover:text-white text-sm font-medium transition-all duration-300 ease-in-out flex items-center gap-2 bg-white/5 hover:bg-white/10 rounded-md border border-white/10 hover:border-white/20 backdrop-blur-sm group relative overflow-hidden"
   >
-    {isShowingMore ? "Show Less" : "Show More"}
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={`transition-transform duration-300 ${
-        isShowingMore ? "rotate-180" : ""
-      }`}
-    >
-      <path d="M6 9l6 6 6-6"/>
-    </svg>
+    <span className="relative z-10 flex items-center gap-2">
+      {isShowingMore ? "See Less" : "See More"}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={transition-transform duration-300 ${
+          isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"
+        }}
+      >
+        <polyline points={isShowingMore ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+      </svg>
+    </span>
+    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500/50 transition-all duration-300 group-hover:w-full"></span>
   </button>
 );
 
-// Keep TabPanel and a11yProps functions same as before
+ToggleButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  isShowingMore: PropTypes.bool.isRequired,
+};
+
+function TabPanel({ children, value, index, ...other }) {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={full-width-tabpanel-${index}}
+      aria-labelledby={full-width-tab-${index}}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: { xs: 1, sm: 3 } }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: full-width-tab-${index},
+    "aria-controls": full-width-tabpanel-${index},
+  };
+}
+
+const techStacks = [
+  { icon: "python.png", language: "Python" },
+  { icon: "typescript.svg", language: "Typescript" },
+  { icon: "figma.svg", language: "Figma" },
+  { icon: "flet.svg", language: "Flet" },
+  { icon: "html.svg", language: "HTML" },
+  { icon: "css.svg", language: "CSS" },
+  { icon: "javascript.svg", language: "JavaScript" },
+  { icon: "nodejs.svg", language: "Node JS" },
+  { icon: "reactjs.svg", language: "ReactJS" },
+  { icon: "kotlin.svg", language: "Kotlin" },
+  { icon: "tailwind.svg", language: "Vite" },
+  { icon: "firebase.svg", language: "Firebase" },
+];
 
 export default function FullWidthTabs() {
-  // Keep state and data fetching logic same as before
+  const theme = useTheme();
+  const [value, setValue] = useState(0);
+  const [projects, setProjects] = useState([]);
+  const [certificates, setCertificates] = useState([]);
+  const [showAllProjects, setShowAllProjects] = useState(false);
+  const [showAllCertificates, setShowAllCertificates] = useState(false);
+  const isMobile = window.innerWidth < 768;
+  const initialItems = isMobile ? 4 : 6;
+
+  useInjectCSS(integratedCSS);
+
+  useEffect(() => {
+    AOS.init({
+      once: false,
+    });
+  }, []);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const projectCollection = collection(db, "projects");
+      const certificateCollection = collection(db, "certificates");
+
+      const [projectSnapshot, certificateSnapshot] = await Promise.all([
+        getDocs(projectCollection),
+        getDocs(certificateCollection),
+      ]);
+
+      const projectData = projectSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        TechStack: doc.data().TechStack || [],
+      }));
+
+      const certificateData = certificateSnapshot.docs.map((doc) => doc.data());
+
+      setProjects(projectData);
+      setCertificates(certificateData);
+
+      localStorage.setItem("projects", JSON.stringify(projectData));
+      localStorage.setItem("certificates", JSON.stringify(certificateData));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const toggleShowMore = useCallback((type) => {
+    if (type === "projects") {
+      setShowAllProjects((prev) => !prev);
+    } else {
+      setShowAllCertificates((prev) => !prev);
+    }
+  }, []);
+
+  const displayedProjects = showAllProjects ? projects : projects.slice(0, initialItems);
+  const displayedCertificates = showAllCertificates ? certificates : certificates.slice(0, initialItems);
 
   return (
-    <div className="md:px-[10%] px-[5%] w-full bg-[#030014] py-16" id="Portfolio">
-      <div className="text-center pb-12" data-aos="fade-up">
-        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+    <div className="md:px-[10%] px-[5%] w-full sm:mt-0 mt-[3rem] bg-[#030014] overflow-hidden" id="Portfolio">
+      <div className="text-center pb-10" data-aos="fade-up" data-aos-duration="1000">
+        <h2 className="inline-block text-3xl md:text-5xl font-bold text-center mx-auto text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
           Portfolio Showcase
         </h2>
-        <p className="text-slate-400 max-w-2xl mx-auto text-base md:text-lg">
-          Curated collection of professional achievements and technical expertise
+        <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base mt-2">
+          Explore my journey through projects, certifications, and technical expertise.
         </p>
       </div>
 
@@ -157,12 +269,23 @@ export default function FullWidthTabs() {
           elevation={0}
           sx={{
             bgcolor: "transparent",
-            borderRadius: "16px",
-            backdropFilter: "blur(12px)",
-            background: "rgba(255, 255, 255, 0.03)",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            mb: 4
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: "20px",
+            position: "relative",
+            overflow: "hidden",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "linear-gradient(180deg, rgba(139, 92, 246, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%)",
+              backdropFilter: "blur(10px)",
+              zIndex: 0,
+            },
           }}
+          className="md:px-4"
         >
           <Tabs
             value={value}
@@ -171,86 +294,120 @@ export default function FullWidthTabs() {
             indicatorColor="secondary"
             variant="fullWidth"
             sx={{
+              minHeight: "70px",
               "& .MuiTab-root": {
-                fontSize: "1rem",
-                fontWeight: "500",
+                fontSize: { xs: "0.9rem", md: "1rem" },
+                fontWeight: "600",
                 color: "#94a3b8",
-                py: 2.5,
-                transition: "all 0.3s ease",
+                textTransform: "none",
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                padding: "20px 0",
+                zIndex: 1,
+                margin: "8px",
+                borderRadius: "12px",
                 "&:hover": {
-                  color: "#fff",
-                  background: "rgba(139, 92, 246, 0.1)"
+                  color: "#ffffff",
+                  backgroundColor: "rgba(139, 92, 246, 0.1)",
+                  transform: "translateY(-2px)",
+                  "& .lucide": {
+                    transform: "scale(1.1) rotate(5deg)",
+                  },
                 },
                 "&.Mui-selected": {
                   color: "#fff",
-                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))"
-                }
-              }
+                  background: "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))",
+                  boxShadow: "0 4px 15px -3px rgba(139, 92, 246, 0.2)",
+                  "& .lucide": {
+                    color: "#a78bfa",
+                  },
+                },
+              },
+              "& .MuiTabs-indicator": {
+                height: 0,
+              },
+              "& .MuiTabs-flexContainer": {
+                gap: "8px",
+              },
             }}
           >
-            <Tab icon={<Code className="w-5 h-5" />} label="Projects" {...a11yProps(0)} />
-            <Tab icon={<Award className="w-5 h-5" />} label="Certificates" {...a11yProps(1)} />
-            <Tab icon={<Boxes className="w-5 h-5" />} label="Tech Stack" {...a11yProps(2)} />
+            <Tab icon={<Code className="mb-2 w-5 h-5 transition-all duration-300" />} label="Projects" {...a11yProps(0)} />
+            <Tab icon={<Award className="mb-2 w-5 h-5 transition-all duration-300" />} label="Certificates" {...a11yProps(1)} />
+            <Tab icon={<Boxes className="mb-2 w-5 h-5 transition-all duration-300" />} label="Tech Stack" {...a11yProps(2)} />
           </Tabs>
         </AppBar>
 
-        <SwipeableViews axis={theme.direction === "rtl" ? "x-reverse" : "x"} index={value}>
-          <TabPanel value={value} index={0}>
-            <div className="scroll-container">
-              <div className="scroll-content">
-                <div className="projects-grid">
-                  {displayedProjects.map((project, index) => (
-                    <CardProject
-                      key={project.id}
-                      {...project}
-                      data-aos="fade-up"
-                      data-aos-delay={index * 50}
-                    />
-                  ))}
-                </div>
-                {projects.length > initialItems && (
-                  <div className="flex justify-center mt-8">
-                    <ToggleButton onClick={() => toggleShowMore("projects")} isShowingMore={showAllProjects} />
+        <SwipeableViews axis={theme.direction === "rtl" ? "x-reverse" : "x"} index={value} onChangeIndex={setValue}>
+          <TabPanel value={value} index={0} dir={theme.direction}>
+            <div className="container mx-auto">
+              <div className="scroll-container">
+                <div className="scroll-content">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
+                    {displayedProjects.map((project, index) => (
+                      <div
+                        key={project.id || index}
+                        data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}
+                        data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
+                      >
+                        <CardProject
+                          Img={project.Img}
+                          Title={project.Title}
+                          Description={project.Description}
+                          Link={project.Link}
+                          id={project.id}
+                        />
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
               </div>
             </div>
+            {projects.length > initialItems && (
+              <div className="mt-6 w-full flex justify-start">
+                <ToggleButton onClick={() => toggleShowMore("projects")} isShowingMore={showAllProjects} />
+              </div>
+            )}
           </TabPanel>
 
-          <TabPanel value={value} index={1}>
-            <div className="scroll-container">
-              <div className="scroll-content">
-                <div className="certificates-grid">
-                  {displayedCertificates.map((certificate, index) => (
-                    <Certificate
-                      key={index}
-                      {...certificate}
-                      data-aos="fade-up"
-                      data-aos-delay={index * 50}
-                    />
-                  ))}
-                </div>
-                {certificates.length > initialItems && (
-                  <div className="flex justify-center mt-8">
-                    <ToggleButton onClick={() => toggleShowMore("certificates")} isShowingMore={showAllCertificates} />
+          <TabPanel value={value} index={1} dir={theme.direction}>
+            <div className="container mx-auto">
+              <div className="scroll-container">
+                <div className="scroll-content">
+                  <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4">
+                    {displayedCertificates.map((certificate, index) => (
+                      <div
+                        key={index}
+                        data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}
+                        data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
+                      >
+                        <Certificate ImgSertif={certificate.Img} />
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
               </div>
             </div>
+            {certificates.length > initialItems && (
+              <div className="mt-6 w-full flex justify-start">
+                <ToggleButton onClick={() => toggleShowMore("certificates")} isShowingMore={showAllCertificates} />
+              </div>
+            )}
           </TabPanel>
 
-          <TabPanel value={value} index={2}>
-            <div className="scroll-container">
-              <div className="scroll-content">
-                <div className="tech-grid">
-                  {techStacks.map((stack, index) => (
-                    <TechStackIcon
-                      key={index}
-                      {...stack}
-                      data-aos="zoom-in"
-                      data-aos-delay={index * 50}
-                    />
-                  ))}
+          <TabPanel value={value} index={2} dir={theme.direction}>
+            <div className="container mx-auto flex justify-center items-center overflow-hidden pb-[5%]">
+              <div className="scroll-container">
+                <div className="scroll-content">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
+                    {techStacks.map((stack, index) => (
+                      <div
+                        key={index}
+                        data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}
+                        data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
+                      >
+                        <TechStackIcon TechStackIcon={stack.icon} Language={stack.language} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -259,4 +416,4 @@ export default function FullWidthTabs() {
       </Box>
     </div>
   );
-}
+}  
