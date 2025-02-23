@@ -22,7 +22,7 @@ const SOCIAL_LINKS = [
 // StatusBadge Component
 const StatusBadge = memo(() => (
   <div
-    className="inline-block animate-float mx-auto mt-4 sm:mt-10"
+    className="inline-block animate-float mx-auto mt-8 sm:mt-10"
     data-aos="zoom-in"
     data-aos-delay="400"
   >
@@ -79,9 +79,9 @@ const CTAButton = memo(({ href, text, icon: Icon }) => (
             {text}
           </span>
           <Icon
-            className={`w-4 h-4 text-gray-200 ${
+            className={w-4 h-4 text-gray-200 ${
               text === "Contact" ? "group-hover:translate-x-1" : "group-hover:rotate-45"
-            } transform transition-all duration-300 z-10`}
+            } transform transition-all duration-300 z-10}
           />
         </span>
       </div>
@@ -127,28 +127,28 @@ const Home = () => {
       progressiveLoad: true,
     },
     style: { width: "100%", height: "100%" },
-    className: `w-full h-full transition-all duration-500 ${
+    className: w-full h-full transition-all duration-500 ${
       isHovering
         ? "scale-[180%] sm:scale-[160%] md:scale-[150%] lg:scale-[145%] rotate-2"
         : "scale-[175%] sm:scale-[155%] md:scale-[145%] lg:scale-[140%]"
-    }`,
+    },
   };
 
   return (
     <div
-      className="min-h-screen bg-[#030014] overflow-hidden home-section pt-4 sm:pt-14"
+      className="min-h-screen bg-[#030014] overflow-hidden home-section pt-12 sm:pt-14"
       id="Home"
     >
       <div
-        className={`relative z-10 transition-all duration-1000 ${
+        className={relative z-10 transition-all duration-1000 ${
           isLoaded ? "opacity-100" : "opacity-0"
-        }`}
+        }}
       >
         <div className="container mx-auto px-[5%] sm:px-6 lg:px-0 min-h-screen">
-          <div className="flex flex-col lg:flex-row items-center justify-center min-h-screen sm:h-screen md:justify-between gap-0 sm:gap-10 lg:gap-16">
+          <div className="flex flex-col lg:flex-row items-center justify-center h-screen md:justify-between gap-0 sm:gap-10 lg:gap-16">
             {/* Left Column */}
             <div
-              className="w-full lg:w-1/2 space-y-4 sm:space-y-6 text-center lg:text-left order-1 lg:order-1 lg:mt-0"
+              className="w-full lg:w-1/2 space-y-4 sm:space-y-6 text-left lg:text-left order-1 lg:order-1 lg:mt-0"
               data-aos="fade-right"
               data-aos-delay="200"
             >
@@ -156,7 +156,7 @@ const Home = () => {
                 <StatusBadge />
                 <MainTitle />
                 <div
-                  className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start"
+                  className="flex flex-wrap gap-2 sm:gap-3 justify-start"
                   data-aos="fade-up"
                   data-aos-delay="1200"
                 >
@@ -165,16 +165,16 @@ const Home = () => {
                   ))}
                 </div>
                 <div
-                  className="flex flex-row gap-3 w-full justify-center lg:justify-start"
+                  className="flex flex-row gap-3 w-full justify-start"
                   data-aos="fade-up"
                   data-aos-delay="1400"
                 >
                   <CTAButton href="#Portfolio" text="Projects" icon={ExternalLink} />
                   <CTAButton href="#Contact" text="Contact" icon={Mail} />
                 </div>
-                {/* SOCIAL_LINKS */}
+                {/* SOCIAL_LINKS now appear on all devices */}
                 <div
-                  className="flex gap-4 justify-center lg:justify-start"
+                  className="flex gap-4 justify-start"
                   data-aos="fade-up"
                   data-aos-delay="1600"
                 >
@@ -195,26 +195,26 @@ const Home = () => {
             >
               <div className="relative w-full opacity-90">
                 <div
-                  className={`absolute inset-0 bg-gradient-to-r from-[#6366f1]/10 to-[#a855f7]/10 rounded-3xl blur-3xl transition-all duration-700 ease-in-out ${
+                  className={absolute inset-0 bg-gradient-to-r from-[#6366f1]/10 to-[#a855f7]/10 rounded-3xl blur-3xl transition-all duration-700 ease-in-out ${
                     isHovering ? "opacity-50 scale-105" : "opacity-20 scale-100"
-                  }`}
+                  }}
                 ></div>
                 <div
-                  className={`relative z-10 w-full opacity-90 transform transition-transform duration-500 ${
+                  className={relative z-10 w-full opacity-90 transform transition-transform duration-500 ${
                     isHovering ? "scale-105" : "scale-100"
-                  }`}
+                  }}
                 >
                   <DotLottieReact {...lottieOptions} />
                 </div>
                 <div
-                  className={`absolute inset-0 pointer-events-none transition-all duration-700 ${
+                  className={absolute inset-0 pointer-events-none transition-all duration-700 ${
                     isHovering ? "opacity-50" : "opacity-20"
-                  }`}
+                  }}
                 >
                   <div
-                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] bg-gradient-to-br from-indigo-500/10 to-purple-500/10 blur-3xl animate-[pulse_6s_cubic-bezier(0.4,0,0.6,1)_infinite] transition-all duration-700 ${
+                    className={absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] bg-gradient-to-br from-indigo-500/10 to-purple-500/10 blur-3xl animate-[pulse_6s_cubic-bezier(0.4,0,0.6,1)_infinite] transition-all duration-700 ${
                       isHovering ? "scale-110" : "scale-100"
-                    }`}
+                    }}
                   ></div>
                 </div>
               </div>
@@ -227,4 +227,3 @@ const Home = () => {
 };
 
 export default memo(Home);
-
