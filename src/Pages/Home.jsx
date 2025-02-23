@@ -4,7 +4,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-// Constants
+
 const TECH_STACK = [
   "Web development",
   "Graphic design",
