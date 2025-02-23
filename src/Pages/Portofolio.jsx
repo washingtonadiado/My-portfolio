@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react"; 
+import React, { useEffect, useState, useCallback } from "react";
 import { db, collection } from "../firebase";
 import { getDocs } from "firebase/firestore";
 import PropTypes from "prop-types";
@@ -16,51 +16,75 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// Integrated CSS as a string
-const integratedCSS = 
+// Updated CSS with animated circular border and auto height
+const integratedCSS = `
 .scroll-container {
   width: 100%;
-  height: 500px;
   background: #07182E;
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
   border-radius: 20px;
   padding: 1rem;
+  isolation: isolate;
 }
 
 .scroll-container::before {
   content: '';
   position: absolute;
-  width: 100px;
-  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
-  height: 130%;
+  inset: 0;
+  background: linear-gradient(45deg, #00b7ff, #ff30ff, #00b7ff);
+  background-size: 200% 200%;
   animation: rotBGimg 3s linear infinite;
-  transition: all 0.2s linear;
-  top: -15%;
-  left: -15%;
+  border-radius: 20px;
+  z-index: 1;
 }
 
 @keyframes rotBGimg {
-  from {
-    transform: rotate(0deg);
+  0% {
+    transform: rotate(0deg) scale(1.2);
+    background-position: 0% 50%;
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    transform: rotate(360deg) scale(1.2);
+    background-position: 0% 50%;
   }
 }
 
 .scroll-container::after {
   content: '';
   position: absolute;
+  inset: 3px;
   background: #07182E;
-  inset: 5px;
-  border-radius: 15px;
+  border-radius: 17px;
+  z-index: 2;
 }
-;
 
-// Inject the CSS into the document head
+.scroll-content {
+  position: relative;
+  z-index: 3;
+}
+
+/* Custom scrollbar styling (if inner scrollbars are needed) */
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #00b7ff, #ff30ff);
+  border-radius: 4px;
+}
+`;
+
 const useInjectCSS = (css) => {
   useEffect(() => {
     const styleTag = document.createElement("style");
@@ -73,33 +97,10 @@ const useInjectCSS = (css) => {
   }, [css]);
 };
 
-// Separate ShowMore/ShowLess button component
 const ToggleButton = ({ onClick, isShowingMore }) => (
   <button
     onClick={onClick}
-    className="
-      px-3 py-1.5
-      text-slate-300 
-      hover:text-white 
-      text-sm 
-      font-medium 
-      transition-all 
-      duration-300 
-      ease-in-out
-      flex 
-      items-center 
-      gap-2
-      bg-white/5 
-      hover:bg-white/10
-      rounded-md
-      border 
-      border-white/10
-      hover:border-white/20
-      backdrop-blur-sm
-      group
-      relative
-      overflow-hidden
-    "
+    className="px-3 py-1.5 text-slate-300 hover:text-white text-sm font-medium transition-all duration-300 ease-in-out flex items-center gap-2 bg-white/5 hover:bg-white/10 rounded-md border border-white/10 hover:border-white/20 backdrop-blur-sm group relative overflow-hidden"
   >
     <span className="relative z-10 flex items-center gap-2">
       {isShowingMore ? "See Less" : "See More"}
@@ -113,11 +114,9 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={
-          transition-transform 
-          duration-300 
-          ${isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"}
-        }
+        className={`transition-transform duration-300 ${
+          isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"
+        }`}
       >
         <polyline points={isShowingMore ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
       </svg>
@@ -136,13 +135,13 @@ function TabPanel({ children, value, index, ...other }) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={full-width-tabpanel-${index}}
-      aria-labelledby={full-width-tab-${index}}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
       {value === index && (
         <Box sx={{ p: { xs: 1, sm: 3 } }}>
-          <Typography>{children}</Typography>
+          <Typography component="div">{children}</Typography>
         </Box>
       )}
     </div>
@@ -157,8 +156,8 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
   return {
-    id: full-width-tab-${index},
-    "aria-controls": full-width-tabpanel-${index},
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
 
@@ -187,7 +186,6 @@ export default function FullWidthTabs() {
   const isMobile = window.innerWidth < 768;
   const initialItems = isMobile ? 4 : 6;
 
-  // Inject the integrated CSS
   useInjectCSS(integratedCSS);
 
   useEffect(() => {
@@ -244,28 +242,17 @@ export default function FullWidthTabs() {
   const displayedCertificates = showAllCertificates ? certificates : certificates.slice(0, initialItems);
 
   return (
-    <div className="md:px-[10%] px-[5%] w-full sm:mt-0 mt-[3rem] bg-[#030014] overflow-hidden" id="Portfolio">
-      {/* Header Section */}
+    <div className="md:px-[10%] px-[5%] w-full sm:mt-0 mt-[3rem] bg-[#030014]" id="Portfolio">
       <div className="text-center pb-10" data-aos="fade-up" data-aos-duration="1000">
-        <h2
-          className="inline-block text-3xl md:text-5xl font-bold text-center mx-auto text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]"
-          style={{
-            color: "#6366f1",
-            backgroundImage: "linear-gradient(45deg, #6366f1 10%, #a855f7 93%)",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
+        <h2 className="inline-block text-3xl md:text-5xl font-bold mx-auto text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
           Portfolio Showcase
         </h2>
         <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base mt-2">
-          Explore my journey through projects, certifications, and technical expertise. Each section represents a milestone in my continuous learning path.
+          Explore my journey through projects, certifications, and technical expertise.
         </p>
       </div>
 
       <Box sx={{ width: "100%" }}>
-        {/* AppBar and Tabs */}
         <AppBar
           position="static"
           elevation={0}
@@ -338,33 +325,45 @@ export default function FullWidthTabs() {
           </Tabs>
         </AppBar>
 
-        <SwipeableViews axis={theme.direction === "rtl" ? "x-reverse" : "x"} index={value} onChangeIndex={setValue}>
-          {/* Projects Section */}
+        <SwipeableViews
+          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+          index={value}
+          onChangeIndex={setValue}
+        >
+          {/* Projects Tab */}
           <TabPanel value={value} index={0} dir={theme.direction}>
             <div className="container mx-auto">
               <div className="scroll-container">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5 relative z-10">
-                  {displayedProjects.map((project, index) => (
-                    <div
-                      key={project.id || index}
-                      data-aos={
-                        index % 3 === 0
-                          ? "fade-up-right"
-                          : index % 3 === 1
-                          ? "fade-up"
-                          : "fade-up-left"
-                      }
-                      data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
-                    >
-                      <CardProject
-                        Img={project.Img}
-                        Title={project.Title}
-                        Description={project.Description}
-                        Link={project.Link}
-                        id={project.id}
-                      />
-                    </div>
-                  ))}
+                <div className="scroll-content">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
+                    {displayedProjects.map((project, index) => (
+                      <div
+                        key={project.id || index}
+                        data-aos={
+                          index % 3 === 0
+                            ? "fade-up-right"
+                            : index % 3 === 1
+                            ? "fade-up"
+                            : "fade-up-left"
+                        }
+                        data-aos-duration={
+                          index % 3 === 0
+                            ? "1000"
+                            : index % 3 === 1
+                            ? "1200"
+                            : "1000"
+                        }
+                      >
+                        <CardProject
+                          Img={project.Img}
+                          Title={project.Title}
+                          Description={project.Description}
+                          Link={project.Link}
+                          id={project.id}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -375,26 +374,34 @@ export default function FullWidthTabs() {
             )}
           </TabPanel>
 
-          {/* Certificates Section */}
+          {/* Certificates Tab */}
           <TabPanel value={value} index={1} dir={theme.direction}>
             <div className="container mx-auto">
               <div className="scroll-container">
-                <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4 relative z-10">
-                  {displayedCertificates.map((certificate, index) => (
-                    <div
-                      key={index}
-                      data-aos={
-                        index % 3 === 0
-                          ? "fade-up-right"
-                          : index % 3 === 1
-                          ? "fade-up"
-                          : "fade-up-left"
-                      }
-                      data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
-                    >
-                      <Certificate ImgSertif={certificate.Img} />
-                    </div>
-                  ))}
+                <div className="scroll-content">
+                  <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4">
+                    {displayedCertificates.map((certificate, index) => (
+                      <div
+                        key={index}
+                        data-aos={
+                          index % 3 === 0
+                            ? "fade-up-right"
+                            : index % 3 === 1
+                            ? "fade-up"
+                            : "fade-up-left"
+                        }
+                        data-aos-duration={
+                          index % 3 === 0
+                            ? "1000"
+                            : index % 3 === 1
+                            ? "1200"
+                            : "1000"
+                        }
+                      >
+                        <Certificate ImgSertif={certificate.Img} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -405,25 +412,35 @@ export default function FullWidthTabs() {
             )}
           </TabPanel>
 
-          {/* Tech Stack Section */}
+          {/* Tech Stack Tab */}
           <TabPanel value={value} index={2} dir={theme.direction}>
-            <div className="container mx-auto flex justify-center items-center overflow-hidden pb-[5%]">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
-                {techStacks.map((stack, index) => (
-                  <div
-                    key={index}
-                    data-aos={
-                      index % 3 === 0
-                        ? "fade-up-right"
-                        : index % 3 === 1
-                        ? "fade-up"
-                        : "fade-up-left"
-                    }
-                    data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
-                  >
-                    <TechStackIcon TechStackIcon={stack.icon} Language={stack.language} />
+            <div className="container mx-auto pb-[5%]">
+              <div className="scroll-container">
+                <div className="scroll-content">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
+                    {techStacks.map((stack, index) => (
+                      <div
+                        key={index}
+                        data-aos={
+                          index % 3 === 0
+                            ? "fade-up-right"
+                            : index % 3 === 1
+                            ? "fade-up"
+                            : "fade-up-left"
+                        }
+                        data-aos-duration={
+                          index % 3 === 0
+                            ? "1000"
+                            : index % 3 === 1
+                            ? "1200"
+                            : "1000"
+                        }
+                      >
+                        <TechStackIcon TechStackIcon={stack.icon} Language={stack.language} />
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </TabPanel>
@@ -432,3 +449,4 @@ export default function FullWidthTabs() {
     </div>
   );
 }
+
