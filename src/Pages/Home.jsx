@@ -22,7 +22,7 @@ const SOCIAL_LINKS = [
 // StatusBadge Component
 const StatusBadge = memo(() => (
   <div
-    className="inline-block animate-float mx-auto mt-8 sm:mt-10"
+    className="inline-block animate-float mx-auto mt-4 sm:mt-10"
     data-aos="zoom-in"
     data-aos-delay="400"
   >
@@ -136,7 +136,7 @@ const Home = () => {
 
   return (
     <div
-      className="min-h-screen bg-[#030014] overflow-hidden home-section pt-12 sm:pt-14"
+      className="min-h-screen bg-[#030014] overflow-hidden home-section pt-4 sm:pt-14"
       id="Home"
     >
       <div
@@ -145,10 +145,10 @@ const Home = () => {
         }`}
       >
         <div className="container mx-auto px-[5%] sm:px-6 lg:px-0 min-h-screen">
-          <div className="flex flex-col lg:flex-row items-center justify-center h-screen md:justify-between gap-0 sm:gap-10 lg:gap-16">
+          <div className="flex flex-col lg:flex-row items-center justify-center min-h-screen sm:h-screen md:justify-between gap-0 sm:gap-10 lg:gap-16">
             {/* Left Column */}
             <div
-              className="w-full lg:w-1/2 space-y-4 sm:space-y-6 text-left lg:text-left order-1 lg:order-1 lg:mt-0"
+              className="w-full lg:w-1/2 space-y-4 sm:space-y-6 text-center lg:text-left order-1 lg:order-1 lg:mt-0"
               data-aos="fade-right"
               data-aos-delay="200"
             >
@@ -156,7 +156,7 @@ const Home = () => {
                 <StatusBadge />
                 <MainTitle />
                 <div
-                  className="flex flex-wrap gap-2 sm:gap-3 justify-start"
+                  className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start"
                   data-aos="fade-up"
                   data-aos-delay="1200"
                 >
@@ -165,16 +165,16 @@ const Home = () => {
                   ))}
                 </div>
                 <div
-                  className="flex flex-row gap-3 w-full justify-start"
+                  className="flex flex-row gap-3 w-full justify-center lg:justify-start"
                   data-aos="fade-up"
                   data-aos-delay="1400"
                 >
                   <CTAButton href="#Portfolio" text="Projects" icon={ExternalLink} />
                   <CTAButton href="#Contact" text="Contact" icon={Mail} />
                 </div>
-                {/* SOCIAL_LINKS now appear on all devices */}
+                {/* SOCIAL_LINKS */}
                 <div
-                  className="flex gap-4 justify-start"
+                  className="flex gap-4 justify-center lg:justify-start"
                   data-aos="fade-up"
                   data-aos-delay="1600"
                 >
