@@ -17,7 +17,7 @@ import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
 // Updated CSS with circular border animation
-const integratedCSS = 
+const integratedCSS = `
 .scroll-container {
   width: 100%;
   height: 500px;
@@ -94,7 +94,7 @@ const integratedCSS =
   background: linear-gradient(45deg, #00b7ff, #ff30ff);
   border-radius: 4px;
 }
-;
+`;
 
 const useInjectCSS = (css) => {
   useEffect(() => {
@@ -125,9 +125,9 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={transition-transform duration-300 ${
+        className={`transition-transform duration-300 ${
           isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"
-        }}
+        }`}
       >
         <polyline points={isShowingMore ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
       </svg>
@@ -146,8 +146,8 @@ function TabPanel({ children, value, index, ...other }) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={full-width-tabpanel-${index}}
-      aria-labelledby={full-width-tab-${index}}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
       {value === index && (
@@ -167,8 +167,8 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
   return {
-    id: full-width-tab-${index},
-    "aria-controls": full-width-tabpanel-${index},
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
 
@@ -416,4 +416,4 @@ export default function FullWidthTabs() {
       </Box>
     </div>
   );
-}  
+}
