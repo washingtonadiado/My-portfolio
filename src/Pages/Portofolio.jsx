@@ -16,18 +16,20 @@ import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// Updated CSS with animated circular border and auto height
-const integratedCSS = 
+// Updated CSS with animated circular border and scrollbar features added
+const integratedCSS = `
 .scroll-container {
   width: 100%;
   background: #07182E;
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   border-radius: 20px;
   padding: 1rem;
   isolation: isolate;
+  max-height: 500px; /* Allows scrolling when content exceeds 500px height */
 }
 
 .scroll-container::before {
@@ -69,7 +71,7 @@ const integratedCSS =
   z-index: 3;
 }
 
-/* Custom scrollbar styling (if inner scrollbars are needed) */
+/* Custom scrollbar styling */
 .scroll-container::-webkit-scrollbar {
   width: 6px;
 }
@@ -83,7 +85,7 @@ const integratedCSS =
   background: linear-gradient(45deg, #00b7ff, #ff30ff);
   border-radius: 4px;
 }
-;
+`;
 
 const useInjectCSS = (css) => {
   useEffect(() => {
@@ -114,9 +116,9 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={transition-transform duration-300 ${
+        className={`transition-transform duration-300 ${
           isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"
-        }}
+        }`}
       >
         <polyline points={isShowingMore ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
       </svg>
@@ -135,8 +137,8 @@ function TabPanel({ children, value, index, ...other }) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={full-width-tabpanel-${index}}
-      aria-labelledby={full-width-tab-${index}}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
       {value === index && (
@@ -156,8 +158,8 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
   return {
-    id: full-width-tab-${index},
-    "aria-controls": full-width-tabpanel-${index},
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
 
