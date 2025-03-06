@@ -115,7 +115,7 @@ const StatCard = memo(({ icon: Icon, color, value, label, description, animation
 const AboutPage = () => {
   // Hardcoded values for the stats
   const totalProjects = 7; // manually set number of projects
-  const totalCertificates = 3; // manually set number of certificates
+  const totalCertificates = 4; // manually set number of certificates
   const YearExperience = 3; // manually set years of experience
 
   // Initialize AOS and setup resize handler
