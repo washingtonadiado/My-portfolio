@@ -22,10 +22,10 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
 
       {!showWelcome && (
         <>
-          <Navbar />
-          <AnimatedBackground />
           <Home />
           <About />
+          <Navbar />
+          <AnimatedBackground />
           <Portfolio />
           <ContactPage />
           <footer>
